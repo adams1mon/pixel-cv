@@ -2,236 +2,149 @@
 
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { 
-  CVData, 
-  HeaderData, 
-  SummaryData, 
-  ExperienceData, 
-  EducationData, 
-  SkillsData, 
-  ProjectData,
-  createEmptyCV 
-} from '../types/cv-data';
+  JsonResume,
+  JsonResumeBasics,
+  JsonResumeWork,
+  JsonResumeEducation,
+  JsonResumeProject,
+  JsonResumeSkill,
+  JsonResumeVolunteer,
+  JsonResumeAward,
+  JsonResumeLanguage,
+  JsonResumeCertificate,
+  JsonResumeInterest,
+  JsonResumePublication,
+  JsonResumeReference,
+  createEmptyJsonResume 
+} from '../types/jsonresume';
 
-// Action types for CV data updates
+// Action types for JsonResume updates
 type CVAction = 
-  | { type: 'SET_CV_DATA'; payload: CVData }
-  | { type: 'UPDATE_HEADER'; payload: HeaderData }
-  | { type: 'UPDATE_SUMMARY'; payload: SummaryData }
-  | { type: 'UPDATE_EXPERIENCE'; payload: ExperienceData[] }
-  | { type: 'ADD_EXPERIENCE'; payload: ExperienceData }
-  | { type: 'UPDATE_SINGLE_EXPERIENCE'; payload: { id: string; data: ExperienceData } }
-  | { type: 'REMOVE_EXPERIENCE'; payload: string }
-  | { type: 'UPDATE_EDUCATION'; payload: EducationData[] }
-  | { type: 'ADD_EDUCATION'; payload: EducationData }
-  | { type: 'UPDATE_SINGLE_EDUCATION'; payload: { id: string; data: EducationData } }
-  | { type: 'REMOVE_EDUCATION'; payload: string }
-  | { type: 'UPDATE_SKILLS'; payload: SkillsData }
-  | { type: 'UPDATE_PROJECTS'; payload: ProjectData[] }
-  | { type: 'ADD_PROJECT'; payload: ProjectData }
-  | { type: 'UPDATE_SINGLE_PROJECT'; payload: { id: string; data: ProjectData } }
-  | { type: 'REMOVE_PROJECT'; payload: string }
-  | { type: 'UPDATE_METADATA'; payload: { title?: string; templateId?: string } };
+  | { type: 'SET_RESUME_DATA'; payload: JsonResume }
+  | { type: 'UPDATE_BASICS'; payload: JsonResumeBasics }
+  | { type: 'UPDATE_WORK'; payload: JsonResumeWork[] }
+  | { type: 'UPDATE_EDUCATION'; payload: JsonResumeEducation[] }
+  | { type: 'UPDATE_PROJECTS'; payload: JsonResumeProject[] }
+  | { type: 'UPDATE_SKILLS'; payload: JsonResumeSkill[] }
+  | { type: 'UPDATE_VOLUNTEER'; payload: JsonResumeVolunteer[] }
+  | { type: 'UPDATE_AWARDS'; payload: JsonResumeAward[] }
+  | { type: 'UPDATE_LANGUAGES'; payload: JsonResumeLanguage[] }
+  | { type: 'UPDATE_CERTIFICATES'; payload: JsonResumeCertificate[] }
+  | { type: 'UPDATE_INTERESTS'; payload: JsonResumeInterest[] }
+  | { type: 'UPDATE_PUBLICATIONS'; payload: JsonResumePublication[] }
+  | { type: 'UPDATE_REFERENCES'; payload: JsonResumeReference[] };
 
 // CV Context interface
 interface CVContextType {
-  cvData: CVData;
-  updateHeader: (data: HeaderData) => void;
-  updateSummary: (data: SummaryData) => void;
-  updateExperience: (data: ExperienceData[]) => void;
-  addExperience: (data: ExperienceData) => void;
-  updateSingleExperience: (id: string, data: ExperienceData) => void;
-  removeExperience: (id: string) => void;
-  updateEducation: (data: EducationData[]) => void;
-  addEducation: (data: EducationData) => void;
-  updateSingleEducation: (id: string, data: EducationData) => void;
-  removeEducation: (id: string) => void;
-  updateSkills: (data: SkillsData) => void;
-  updateProjects: (data: ProjectData[]) => void;
-  addProject: (data: ProjectData) => void;
-  updateSingleProject: (id: string, data: ProjectData) => void;
-  removeProject: (id: string) => void;
-  updateMetadata: (metadata: { title?: string; templateId?: string }) => void;
+  cvData: JsonResume;
+  updateBasics: (data: JsonResumeBasics) => void;
+  updateWork: (data: JsonResumeWork[]) => void;
+  updateEducation: (data: JsonResumeEducation[]) => void;
+  updateProjects: (data: JsonResumeProject[]) => void;
+  updateSkills: (data: JsonResumeSkill[]) => void;
+  updateVolunteer: (data: JsonResumeVolunteer[]) => void;
+  updateAwards: (data: JsonResumeAward[]) => void;
+  updateLanguages: (data: JsonResumeLanguage[]) => void;
+  updateCertificates: (data: JsonResumeCertificate[]) => void;
+  updateInterests: (data: JsonResumeInterest[]) => void;
+  updatePublications: (data: JsonResumePublication[]) => void;
+  updateReferences: (data: JsonResumeReference[]) => void;
   saveToLocalStorage: () => void;
   loadFromLocalStorage: () => void;
-  // TODO: Add export functionality (JSON, PDF)
-  // TODO: Add import functionality
-  // TODO: Add undo/redo functionality
+  exportAsJson: () => string;
+  importFromJson: (jsonString: string) => void;
 }
 
-// Reducer function
-const cvReducer = (state: CVData, action: CVAction): CVData => {
-  const newState = (() => {
-    switch (action.type) {
-      case 'SET_CV_DATA':
-        return action.payload;
-      
-      case 'UPDATE_HEADER':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            header: action.payload,
-          },
-        };
-      
-      case 'UPDATE_SUMMARY':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            summary: action.payload,
-          },
-        };
-      
-      case 'UPDATE_EXPERIENCE':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            experience: action.payload,
-          },
-        };
-      
-      case 'ADD_EXPERIENCE':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            experience: [...state.sections.experience, action.payload],
-          },
-        };
-      
-      case 'UPDATE_SINGLE_EXPERIENCE':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            experience: state.sections.experience.map(exp =>
-              exp.id === action.payload.id ? action.payload.data : exp
-            ),
-          },
-        };
-      
-      case 'REMOVE_EXPERIENCE':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            experience: state.sections.experience.filter(exp => exp.id !== action.payload),
-          },
-        };
-      
-      case 'UPDATE_EDUCATION':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            education: action.payload,
-          },
-        };
-      
-      case 'ADD_EDUCATION':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            education: [...state.sections.education, action.payload],
-          },
-        };
-      
-      case 'UPDATE_SINGLE_EDUCATION':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            education: state.sections.education.map(edu =>
-              edu.id === action.payload.id ? action.payload.data : edu
-            ),
-          },
-        };
-      
-      case 'REMOVE_EDUCATION':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            education: state.sections.education.filter(edu => edu.id !== action.payload),
-          },
-        };
-      
-      case 'UPDATE_SKILLS':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            skills: action.payload,
-          },
-        };
-      
-      case 'UPDATE_PROJECTS':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            projects: action.payload,
-          },
-        };
-      
-      case 'ADD_PROJECT':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            projects: [...state.sections.projects, action.payload],
-          },
-        };
-      
-      case 'UPDATE_SINGLE_PROJECT':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            projects: state.sections.projects.map(project =>
-              project.id === action.payload.id ? action.payload.data : project
-            ),
-          },
-        };
-      
-      case 'REMOVE_PROJECT':
-        return {
-          ...state,
-          sections: {
-            ...state.sections,
-            projects: state.sections.projects.filter(project => project.id !== action.payload),
-          },
-        };
-      
-      case 'UPDATE_METADATA':
-        return {
-          ...state,
-          metadata: {
-            ...state.metadata,
-            ...action.payload,
-          },
-        };
-      
-      default:
-        return state;
-    }
-  })();
+// TODO: Add undo/redo functionality
 
-  // Update timestamp on any change
-  return {
-    ...newState,
-    updatedAt: new Date().toISOString(),
-  };
+// Reducer function
+const cvReducer = (state: JsonResume, action: CVAction): JsonResume => {
+  switch (action.type) {
+    case 'SET_RESUME_DATA':
+      return action.payload;
+    
+    case 'UPDATE_BASICS':
+      return {
+        ...state,
+        basics: action.payload,
+      };
+    
+    case 'UPDATE_WORK':
+      return {
+        ...state,
+        work: action.payload,
+      };
+    
+    case 'UPDATE_EDUCATION':
+      return {
+        ...state,
+        education: action.payload,
+      };
+    
+    case 'UPDATE_PROJECTS':
+      return {
+        ...state,
+        projects: action.payload,
+      };
+    
+    case 'UPDATE_SKILLS':
+      return {
+        ...state,
+        skills: action.payload,
+      };
+    
+    case 'UPDATE_VOLUNTEER':
+      return {
+        ...state,
+        volunteer: action.payload,
+      };
+    
+    case 'UPDATE_AWARDS':
+      return {
+        ...state,
+        awards: action.payload,
+      };
+    
+    case 'UPDATE_LANGUAGES':
+      return {
+        ...state,
+        languages: action.payload,
+      };
+    
+    case 'UPDATE_CERTIFICATES':
+      return {
+        ...state,
+        certificates: action.payload,
+      };
+    
+    case 'UPDATE_INTERESTS':
+      return {
+        ...state,
+        interests: action.payload,
+      };
+    
+    case 'UPDATE_PUBLICATIONS':
+      return {
+        ...state,
+        publications: action.payload,
+      };
+    
+    case 'UPDATE_REFERENCES':
+      return {
+        ...state,
+        references: action.payload,
+      };
+    
+    default:
+      return state;
+  }
 };
 
 // Create context
 const CVContext = createContext<CVContextType | undefined>(undefined);
 
 // Local storage key
-const CV_STORAGE_KEY = 'pixel-cv-data';
+const CV_STORAGE_KEY = 'pixel-cv-jsonresume-data';
 
 // Provider component
 interface CVProviderProps {
@@ -239,7 +152,7 @@ interface CVProviderProps {
 }
 
 export const CVProvider: React.FC<CVProviderProps> = ({ children }) => {
-  const [cvData, dispatch] = useReducer(cvReducer, createEmptyCV());
+  const [cvData, dispatch] = useReducer(cvReducer, createEmptyJsonResume());
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -258,9 +171,9 @@ export const CVProvider: React.FC<CVProviderProps> = ({ children }) => {
   const saveToLocalStorage = () => {
     try {
       localStorage.setItem(CV_STORAGE_KEY, JSON.stringify(cvData));
-      console.log('CV data saved to localStorage');
+      console.log('Resume data saved to localStorage');
     } catch (error) {
-      console.error('Failed to save CV data to localStorage:', error);
+      console.error('Failed to save resume data to localStorage:', error);
       // TODO: Show user notification about save failure
     }
   };
@@ -269,41 +182,56 @@ export const CVProvider: React.FC<CVProviderProps> = ({ children }) => {
     try {
       const savedData = localStorage.getItem(CV_STORAGE_KEY);
       if (savedData) {
-        const parsedData = JSON.parse(savedData) as CVData;
-        dispatch({ type: 'SET_CV_DATA', payload: parsedData });
-        console.log('CV data loaded from localStorage');
+        const parsedData = JSON.parse(savedData) as JsonResume;
+        dispatch({ type: 'SET_RESUME_DATA', payload: parsedData });
+        console.log('Resume data loaded from localStorage');
       }
     } catch (error) {
-      console.error('Failed to load CV data from localStorage:', error);
+      console.error('Failed to load resume data from localStorage:', error);
       // TODO: Show user notification about load failure
+    }
+  };
+
+  const exportAsJson = (): string => {
+    try {
+      return JSON.stringify(cvData, null, 2);
+    } catch (error) {
+      console.error('Failed to export resume as JSON:', error);
+      return '';
+    }
+  };
+
+  const importFromJson = (jsonString: string) => {
+    try {
+      const parsedData = JSON.parse(jsonString) as JsonResume;
+      // TODO: Add validation to ensure the imported data matches JsonResume schema
+      dispatch({ type: 'SET_RESUME_DATA', payload: parsedData });
+      console.log('Resume data imported from JSON');
+    } catch (error) {
+      console.error('Failed to import resume from JSON:', error);
+      // TODO: Show user notification about import failure
     }
   };
 
   // Context value
   const contextValue: CVContextType = {
-    cvData,
-    updateHeader: (data: HeaderData) => dispatch({ type: 'UPDATE_HEADER', payload: data }),
-    updateSummary: (data: SummaryData) => dispatch({ type: 'UPDATE_SUMMARY', payload: data }),
-    updateExperience: (data: ExperienceData[]) => dispatch({ type: 'UPDATE_EXPERIENCE', payload: data }),
-    addExperience: (data: ExperienceData) => dispatch({ type: 'ADD_EXPERIENCE', payload: data }),
-    updateSingleExperience: (id: string, data: ExperienceData) => 
-      dispatch({ type: 'UPDATE_SINGLE_EXPERIENCE', payload: { id, data } }),
-    removeExperience: (id: string) => dispatch({ type: 'REMOVE_EXPERIENCE', payload: id }),
-    updateEducation: (data: EducationData[]) => dispatch({ type: 'UPDATE_EDUCATION', payload: data }),
-    addEducation: (data: EducationData) => dispatch({ type: 'ADD_EDUCATION', payload: data }),
-    updateSingleEducation: (id: string, data: EducationData) => 
-      dispatch({ type: 'UPDATE_SINGLE_EDUCATION', payload: { id, data } }),
-    removeEducation: (id: string) => dispatch({ type: 'REMOVE_EDUCATION', payload: id }),
-    updateSkills: (data: SkillsData) => dispatch({ type: 'UPDATE_SKILLS', payload: data }),
-    updateProjects: (data: ProjectData[]) => dispatch({ type: 'UPDATE_PROJECTS', payload: data }),
-    addProject: (data: ProjectData) => dispatch({ type: 'ADD_PROJECT', payload: data }),
-    updateSingleProject: (id: string, data: ProjectData) => 
-      dispatch({ type: 'UPDATE_SINGLE_PROJECT', payload: { id, data } }),
-    removeProject: (id: string) => dispatch({ type: 'REMOVE_PROJECT', payload: id }),
-    updateMetadata: (metadata: { title?: string; templateId?: string }) => 
-      dispatch({ type: 'UPDATE_METADATA', payload: metadata }),
+    cvData: cvData,
+    updateBasics: (data: JsonResumeBasics) => dispatch({ type: 'UPDATE_BASICS', payload: data }),
+    updateWork: (data: JsonResumeWork[]) => dispatch({ type: 'UPDATE_WORK', payload: data }),
+    updateEducation: (data: JsonResumeEducation[]) => dispatch({ type: 'UPDATE_EDUCATION', payload: data }),
+    updateProjects: (data: JsonResumeProject[]) => dispatch({ type: 'UPDATE_PROJECTS', payload: data }),
+    updateSkills: (data: JsonResumeSkill[]) => dispatch({ type: 'UPDATE_SKILLS', payload: data }),
+    updateVolunteer: (data: JsonResumeVolunteer[]) => dispatch({ type: 'UPDATE_VOLUNTEER', payload: data }),
+    updateAwards: (data: JsonResumeAward[]) => dispatch({ type: 'UPDATE_AWARDS', payload: data }),
+    updateLanguages: (data: JsonResumeLanguage[]) => dispatch({ type: 'UPDATE_LANGUAGES', payload: data }),
+    updateCertificates: (data: JsonResumeCertificate[]) => dispatch({ type: 'UPDATE_CERTIFICATES', payload: data }),
+    updateInterests: (data: JsonResumeInterest[]) => dispatch({ type: 'UPDATE_INTERESTS', payload: data }),
+    updatePublications: (data: JsonResumePublication[]) => dispatch({ type: 'UPDATE_PUBLICATIONS', payload: data }),
+    updateReferences: (data: JsonResumeReference[]) => dispatch({ type: 'UPDATE_REFERENCES', payload: data }),
     saveToLocalStorage,
     loadFromLocalStorage,
+    exportAsJson,
+    importFromJson,
   };
 
   return (

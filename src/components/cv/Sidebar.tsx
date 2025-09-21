@@ -9,6 +9,13 @@ import {
   GraduationCap, 
   Lightbulb, 
   FolderOpen,
+  Heart,
+  Award,
+  Globe,
+  Badge,
+  Star,
+  BookOpen,
+  UserCheck,
   Menu
 } from 'lucide-react';
 
@@ -58,6 +65,7 @@ export const Sidebar: React.FC = () => {
                   }
                 `}
                 onClick={() => setActiveSection(section.id)}
+                title={sidebarCollapsed ? section.label : section.description}
             >
                 {/* Section icon */}
                 <div className="flex-shrink-0">
@@ -67,6 +75,11 @@ export const Sidebar: React.FC = () => {
                 {/* Section label - hidden when collapsed */}
                 {!sidebarCollapsed && (
                   <span className="ml-3 truncate">{section.label}</span>
+                )}
+                
+                {/* Optional indicator - shown when collapsed */}
+                {!sidebarCollapsed && section.optional && (
+                  <span className="ml-auto text-xs text-gray-400">optional</span>
                 )}
             </li>
           ))}
@@ -78,23 +91,48 @@ export const Sidebar: React.FC = () => {
   );
 };
 
-// Helper function to get section-specific icons
+// Helper function to get section-specific icons for all JsonResume sections
 const getSectionIcon = (sectionId: string) => {
   const iconClass = "w-4 h-4";
   
   switch (sectionId) {
+    // Core JsonResume sections
+    case 'basics':
+      return <User className={iconClass} />;
+    case 'work':
+      return <Briefcase className={iconClass} />;
+    case 'projects':
+      return <FolderOpen className={iconClass} />;
+    case 'education':
+      return <GraduationCap className={iconClass} />;
+    case 'skills':
+      return <Lightbulb className={iconClass} />;
+    
+    // New JsonResume sections
+    case 'volunteer':
+      return <Heart className={iconClass} />;
+    case 'awards':
+      return <Award className={iconClass} />;
+    case 'languages':
+      return <Globe className={iconClass} />;
+    case 'certificates':
+      return <Badge className={iconClass} />;
+    case 'interests':
+      return <Star className={iconClass} />;
+    case 'publications':
+      return <BookOpen className={iconClass} />;
+    case 'references':
+      return <UserCheck className={iconClass} />;
+    
+    // Legacy fallback cases (for backward compatibility)
     case 'header':
       return <User className={iconClass} />;
     case 'summary':
       return <FileText className={iconClass} />;
     case 'experience':
       return <Briefcase className={iconClass} />;
-    case 'education':
-      return <GraduationCap className={iconClass} />;
-    case 'skills':
-      return <Lightbulb className={iconClass} />;
-    case 'projects':
-      return <FolderOpen className={iconClass} />;
+    
+    // Default fallback
     default:
       return <FileText className={iconClass} />;
   }

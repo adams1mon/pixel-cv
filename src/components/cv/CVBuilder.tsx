@@ -1,81 +1,72 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { Download, Loader2 } from 'lucide-react';
-import { CVProvider, useCV } from '../../contexts/CVContext';
-import { UIProvider } from '../../contexts/UIContext';
-import { modernHandlebarsTemplate } from '../../types/handlebars-template';
+import { useCV } from '../../contexts/CVContext';
 import { Sidebar } from './Sidebar';
 import { SectionRouter } from './SectionRouter';
 import { ModernReactPdf } from '../templates/ModernReactPdf';
-import { generateAndDownloadPdf } from '../../services/exportPdf';
+
+import { usePDF } from '@react-pdf/renderer';
 
 
 import dynamic from 'next/dynamic';
 import { setupFonts } from './load-fonts';
+import { clsx } from 'clsx';
 
 const CanvasPdfPreview = dynamic(
   () => import("./CanvasPdfPreview").then(m => m.CanvasPdfPreview),
-  {
-    loading: () => <div>Loading...</div>
-  }
 );
-
-// import { Document } from 'react-pdf';
-const Document = dynamic(
-  () => import("react-pdf").then(m => m.Document),
-  {
-    ssr: false,
-    loading: () => (
-      <button disabled>
-        <Loader2 className='animate-spin mr-2'/>
-        Loading...
-      </button> 
-    )
-  }
-)
-
-const PDFViewer = dynamic(
-  () => import("@react-pdf/renderer").then(m => m.PDFViewer),
-  {
-    ssr: false,
-    loading: () => (
-      <button disabled>
-        <Loader2 className='animate-spin mr-2'/>
-        Loading...
-      </button> 
-    )
-  }
-)
-
-const PDFDownloadLink = dynamic(
-  () => import("@react-pdf/renderer").then(m => m.PDFDownloadLink),
-  {
-    ssr: false,
-    loading: () => (
-      <button disabled>
-        <Loader2 className='animate-spin mr-2'/>
-        Loading...
-      </button> 
-    )
-  }
-)
 
 setupFonts();
 
 const headerSize = 40;
 
 // Main content component that uses the CV context
-const CVBuilderLayout: React.FC = () => {
+export const CVBuilder: React.FC = () => {
   const { cvData } = useCV();
+  
+  // Debounced PDF document state
+  const [debouncedCvDoc, setDebouncedCvDoc] = React.useState<React.ReactElement<any>>(
+    <ModernReactPdf data={cvData} />
+  );
+
+  // PDF instance - lifted from CanvasPdfPreview
+  const [pdfInstance, updatePdf] = usePDF({ document: debouncedCvDoc });
 
   useEffect(() => {
     console.log("cv data update");
   }, [cvData]);
 
-  // Keep handlebars template import for reference only
-  const template = useMemo(() => modernHandlebarsTemplate, []);
-  const [exporting, setExporting] = React.useState(false);
+  // Debounce PDF document creation to prevent UI blocking
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedCvDoc(<ModernReactPdf data={cvData} />);
+    }, 400); // 300ms debounce for responsive feel
+
+    return () => clearTimeout(timeoutId);
+  }, [cvData]);
+
+  // Update PDF when debounced document changes
+  useEffect(() => {
+    if (debouncedCvDoc) {
+      updatePdf(debouncedCvDoc);
+    }
+  }, [debouncedCvDoc, updatePdf]);
+
+  // Download function using existing PDF blob
+  const downloadPdf = () => {
+    if (pdfInstance.blob) {
+      const url = URL.createObjectURL(pdfInstance.blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${cvData.metadata.title || 'CV'}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
 
   // TODO: loading indicator
   // TODO: solve dommatrix missing 
@@ -98,22 +89,21 @@ const CVBuilderLayout: React.FC = () => {
               <span>•</span>
               <span>Auto-preview enabled</span>
               <span>•</span>
-              <button
-                onClick={async () => {
-                  try {
-                    setExporting(true);
-                    await generateAndDownloadPdf({ data: cvData });
-                  } catch (e) {
-                    console.error('Export PDF failed', e);
-                  } finally {
-                    setExporting(false);
-                  }
-                }}
-                className="flex items-center gap-2 px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-sm hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
-                disabled={exporting}
+
+              <button 
+                onClick={downloadPdf}
+                disabled={!!(pdfInstance.loading || pdfInstance.error || !pdfInstance.blob)}
+                className={clsx(
+                  "flex items-center gap-2 px-3 py-1 text-white text-sm font-medium rounded-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-1 transition-colors",
+                  pdfInstance.loading || pdfInstance.error || !pdfInstance.blob ? "bg-gray-600" : "bg-blue-600 hover:bg-blue-700"
+                )}
               >
+                {pdfInstance.loading ?
+                <Loader2 className="w-4 h-4 animate-spin" />
+                :
                 <Download className="w-4 h-4" />
-                {exporting ? 'Exporting…' : 'Export PDF'}
+                }
+                Download CV
               </button>
             </div>
           </div>
@@ -133,24 +123,12 @@ const CVBuilderLayout: React.FC = () => {
         {/* Right Side - React-PDF Preview */}
         <div className="h-full flex-1 p-2 shadow-sm overflow-hidden bg-gray-500">
           <CanvasPdfPreview
-            pdfDocument={<ModernReactPdf data={cvData} /> as any}
+            pdfInstance={pdfInstance}
             // width={300}
             initialScale={1}
           />
         </div>
       </main>
-
     </div>
-  );
-};
-
-// Main export component wrapped with CVProvider and UIProvider
-export const CVBuilder: React.FC = () => {
-  return (
-    <CVProvider>
-      <UIProvider>
-        <CVBuilderLayout />
-      </UIProvider>
-    </CVProvider>
   );
 };

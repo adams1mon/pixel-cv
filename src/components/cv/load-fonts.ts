@@ -4,16 +4,6 @@ import { Font } from '@react-pdf/renderer';
 
 export function setupFonts() {
 
-  // export function ensureEmojiSourceRegistered() {
-  //   if (registered) return;
-  //   // Register Twemoji PNG set (72x72). React-PDF will fetch by codepoint file name.
-  //   Font.registerEmojiSource({
-  //     format: 'png',
-  //     url: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/'
-  //   });
-  //   registered = true;
-  // } 
-
   Font.registerEmojiSource({
     format: 'png',
     url: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/'

@@ -2,30 +2,27 @@
 
 import React from 'react';
 import { Document, Page, View, Text, StyleSheet, Link } from '@react-pdf/renderer';
-import { CVData } from '../../types/cv-data';
+import { JsonResume } from '../../types/jsonresume';
 
 interface ModernReactPdfProps {
-  data: CVData;
+  data: JsonResume;
 }
 
 // TODO: use canvas for graphics
-
-// could also use canvas for the icons, not emojis
-// canvas -> can use svg -> icons are basically svg anyways, so win
-// can use SVG component directly, use lucide svgs!!!
-
-// TODO: use jsonresume
+// TODO: use lucide SVG icons instead of emojis
 
 const styles = StyleSheet.create({
   document: {
-    // TODO: list supported fonts
-    // fontFamily: 'Helvetica',
     fontFamily: 'Roboto',
     color: '#1f2937'
   },
   page: {
-    padding: 24
+    padding: 24,
+    fontSize: 11,
+    lineHeight: 1.4
   },
+  
+  // Header styles
   header: {
     textAlign: 'center',
     marginBottom: 24,
@@ -34,31 +31,35 @@ const styles = StyleSheet.create({
     borderBottomColor: '#3b82f6'
   },
   name: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 700,
-    marginBottom: 6
+    marginBottom: 6,
+    color: '#1f2937'
   },
-  title: {
-    fontSize: 14,
-    color: '#6b7280'
+  label: {
+    fontSize: 16,
+    color: '#6b7280',
+    marginBottom: 8
   },
   contactRow: {
-    marginTop: 8,
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginTop: 6
   },
   contactText: {
     fontSize: 10,
     color: '#6b7280',
-    marginHorizontal: 6
+    marginHorizontal: 8
   },
   contactLink: {
     fontSize: 10,
     color: '#3b82f6',
-    marginHorizontal: 6,
+    marginHorizontal: 8,
     textDecoration: 'none'
   },
+
+  // Section styles
   section: {
     marginBottom: 20
   },
@@ -69,44 +70,84 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     paddingBottom: 4,
     borderBottomWidth: 2,
-    borderBottomColor: '#3b82f6'
+    borderBottomColor: '#3b82f6',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5
   },
+
+  // Summary styles
   summaryText: {
     fontSize: 11,
     color: '#4b5563',
-    lineHeight: 1.4
+    lineHeight: 1.5,
+    textAlign: 'justify'
   },
-  expItem: {
-    marginBottom: 12
+
+  // Work/Experience styles
+  workItem: {
+    marginBottom: 14,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb'
   },
-  expHeader: {
+  workHeader: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
-    marginBottom: 2
+    marginBottom: 3
   },
-  expPosition: {
+  workPosition: {
+    fontSize: 13,
+    fontWeight: 700,
+    color: '#1f2937'
+  },
+  workCompany: {
     fontSize: 12,
-    fontWeight: 700
+    color: '#3b82f6',
+    fontWeight: 600
   },
-  expCompany: {
-    fontSize: 11,
-    color: '#3b82f6'
-  },
-  expMeta: {
+  workMeta: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     fontSize: 10,
     color: '#6b7280',
-    marginBottom: 4
+    marginBottom: 6
   },
-  expDesc: {
+  workSummary: {
     fontSize: 11,
     color: '#4b5563',
-    lineHeight: 1.4
+    lineHeight: 1.4,
+    marginBottom: 4
   },
+  highlightsList: {
+    marginTop: 4
+  },
+  highlight: {
+    fontSize: 10,
+    color: '#4b5563',
+    marginBottom: 2,
+    paddingLeft: 8
+  },
+  keywordChips: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 4
+  },
+  keywordChip: {
+    fontSize: 9,
+    backgroundColor: '#dbeafe',
+    color: '#1e40af',
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 9999,
+    marginRight: 4,
+    marginBottom: 3
+  },
+
+  // Education styles
   eduItem: {
     marginBottom: 12
   },
@@ -134,11 +175,11 @@ const styles = StyleSheet.create({
     marginBottom: 4
   },
   eduDetails: {
-    display: 'flex',
-    flexDirection: 'row',
     fontSize: 10,
     color: '#6b7280'
   },
+
+  // Skills styles
   skillsWrap: {
     display: 'flex',
     flexDirection: 'row',
@@ -154,6 +195,8 @@ const styles = StyleSheet.create({
     marginRight: 6,
     marginBottom: 6
   },
+
+  // Projects styles
   projItem: {
     marginBottom: 16,
     paddingBottom: 12,
@@ -168,7 +211,7 @@ const styles = StyleSheet.create({
     marginBottom: 6
   },
   projName: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 700
   },
   projDates: {
@@ -182,200 +225,422 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     lineHeight: 1.4
   },
-  projTechWrap: {
+
+  // Volunteer styles
+  volunteerItem: {
+    marginBottom: 12
+  },
+  volunteerHeader: {
     display: 'flex',
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 8
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginBottom: 2
   },
-  projTech: {
+  volunteerPosition: {
+    fontSize: 12,
+    fontWeight: 700
+  },
+  volunteerOrg: {
+    fontSize: 11,
+    color: '#059669'
+  },
+
+  // Awards styles
+  awardItem: {
+    marginBottom: 10
+  },
+  awardTitle: {
+    fontSize: 12,
+    fontWeight: 700
+  },
+  awardAwarder: {
     fontSize: 10,
-    backgroundColor: '#dbeafe',
-    color: '#1e40af',
-    paddingVertical: 2,
-    paddingHorizontal: 8,
-    borderRadius: 9999,
-    marginRight: 6,
+    color: '#d97706',
+    fontWeight: 600
+  },
+  awardDate: {
+    fontSize: 10,
+    color: '#6b7280'
+  },
+
+  // Languages styles
+  langItem: {
     marginBottom: 6
   },
-  projLinks: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap'
+  langName: {
+    fontSize: 11,
+    fontWeight: 600
   },
-  projLink: {
+  langFluency: {
     fontSize: 10,
-    color: '#3b82f6',
-    marginRight: 8
+    color: '#6b7280'
+  },
+
+  // Certificate styles
+  certItem: {
+    marginBottom: 10
+  },
+  certName: {
+    fontSize: 11,
+    fontWeight: 600
+  },
+  certIssuer: {
+    fontSize: 10,
+    color: '#7c3aed'
+  },
+
+  // Interest styles
+  interestItem: {
+    marginBottom: 8
+  },
+  interestName: {
+    fontSize: 11,
+    fontWeight: 600
+  },
+  interestKeywords: {
+    fontSize: 10,
+    color: '#6b7280'
+  },
+
+  // Publication styles
+  pubItem: {
+    marginBottom: 12
+  },
+  pubName: {
+    fontSize: 11,
+    fontWeight: 700
+  },
+  pubPublisher: {
+    fontSize: 10,
+    color: '#7c2d12'
+  },
+
+  // Reference styles
+  refItem: {
+    marginBottom: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6'
+  },
+  refName: {
+    fontSize: 11,
+    fontWeight: 700
+  },
+  refText: {
+    fontSize: 10,
+    color: '#4b5563',
+    fontStyle: 'italic',
+    lineHeight: 1.3
   }
 });
 
 export const ModernReactPdf: React.FC<ModernReactPdfProps> = ({ data }) => {
-  console.log("modern cv pdf create");
+  console.log("JsonResume PDF generation started");
   
-  const header = data.sections.header.personalInfo;
-  const contact = data.sections.header.contact;
-  const summary = data.sections.summary;
-  const experience = data.sections.experience || [];
-  const education = data.sections.education || [];
-  const skills = data.sections.skills?.skills || [];
-  const projects = data.sections.projects || [];
+  // Extract all sections
+  const basics = data.basics;
+  const work = data.work || [];
+  const projects = data.projects || [];
+  const education = data.education || [];
+  const skills = data.skills || [];
+  const volunteer = data.volunteer || [];
+  const awards = data.awards || [];
+  const languages = data.languages || [];
+  const certificates = data.certificates || [];
+  const interests = data.interests || [];
+  const publications = data.publications || [];
+  const references = data.references || [];
 
   return (
     <Document style={styles.document}>
       <Page size="A4" style={styles.page}>
-        {/* Header */}
+        {/* Header Section */}
         <View style={styles.header}>
-          <Text style={styles.name}>
-            {header.firstName} {header.lastName}
-          </Text>
-          {header.title ? (
-            <Text style={styles.title}>{header.title}</Text>
-          ) : null}
+          <Text style={styles.name}>{basics.name}</Text>
+          {basics.label && <Text style={styles.label}>{basics.label}</Text>}
 
           {/* Contact Row 1: location, email, phone */}
-          {(header.location || contact.email || contact.phone) ? (
+          {(basics.location?.city || basics.email || basics.phone) && (
             <View style={styles.contactRow}>
-              {header.location ? (
-                <Text style={styles.contactText}>📍 {header.location}</Text>
-              ) : null}
-              {contact.email ? (
-                <Text style={styles.contactText}>✉️ {contact.email}</Text>
-              ) : null}
-              {contact.phone ? (
-                <Text style={styles.contactText}>📞 {contact.phone}</Text>
-              ) : null}
+              {basics.location?.city && (
+                <Text style={styles.contactText}>
+                  📍 {basics.location.city}{basics.location.region ? `, ${basics.location.region}` : ''}
+                </Text>
+              )}
+              {basics.email && <Text style={styles.contactText}>✉️ {basics.email}</Text>}
+              {basics.phone && <Text style={styles.contactText}>📞 {basics.phone}</Text>}
             </View>
-          ) : null}
+          )}
 
-          {/* Contact Row 2: website, linkedin, github */}
-          {(contact.website || contact.linkedin || contact.github) ? (
+          {/* Contact Row 2: website and profiles */}
+          {(basics.url || (basics.profiles && basics.profiles.length > 0)) && (
             <View style={styles.contactRow}>
-              {contact.website ? (
-                <Link src={contact.website} style={styles.contactLink}>🌐 {contact.website}</Link>
-              ) : null}
-              {contact.linkedin ? (
-                <Link src={contact.linkedin} style={styles.contactLink}>💼 LinkedIn</Link>
-              ) : null}
-              {contact.github ? (
-                <Link src={contact.github} style={styles.contactLink}>💻 GitHub</Link>
-              ) : null}
+              {basics.url && (
+                <Link src={basics.url} style={styles.contactLink}>
+                  🌐 {basics.url.replace(/^https?:\/\//, '')}
+                </Link>
+              )}
+              {basics.profiles && basics.profiles.slice(0, 3).map((profile, i) => (
+                <Link key={i} src={profile.url} style={styles.contactLink}>
+                  {profile.network === 'LinkedIn' && '💼'}
+                  {profile.network === 'GitHub' && '💻'}
+                  {profile.network === 'Twitter' && '🐦'}
+                  {!['LinkedIn', 'GitHub', 'Twitter'].includes(profile.network) && '🔗'}
+                  {' '}{profile.network}
+                </Link>
+              ))}
             </View>
-          ) : null}
+          )}
         </View>
 
-        {/* Summary */}
-        {summary?.isVisible && summary?.content ? (
+        {/* Professional Summary */}
+        {basics.summary && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Professional Summary</Text>
-            <Text style={styles.summaryText}>{summary.content}</Text>
+            <Text style={styles.summaryText}>{basics.summary}</Text>
           </View>
-        ) : null}
+        )}
 
-        {/* Experience */}
-        {experience.length > 0 ? (
+        {/* Work Experience */}
+        {work.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Professional Experience</Text>
-            {experience.map((exp, i) => (
-              <View key={i} style={styles.expItem}>
-                <View style={styles.expHeader}>
-                  <Text style={styles.expPosition}>{exp.position}</Text>
-                  <Text style={styles.expCompany}>{exp.company}</Text>
+            {work.map((job, i) => (
+              <View key={i} style={styles.workItem}>
+                <View style={styles.workHeader}>
+                  <Text style={styles.workPosition}>{job.position}</Text>
+                  <Text style={styles.workCompany}>{job.name}</Text>
                 </View>
-                <View style={styles.expMeta}>
-                  <Text>{exp.location}</Text>
-                  <Text>
-                    {exp.startDate} - {exp.isCurrentPosition ? 'Present' : (exp.endDate || '')}
-                  </Text>
+                <View style={styles.workMeta}>
+                  <Text>{job.location || job.website}</Text>
+                  <Text>{job.startDate}{job.endDate ? ` - ${job.endDate}` : ' - Present'}</Text>
                 </View>
-                {exp.description ? (
-                  <Text style={styles.expDesc}>{exp.description}</Text>
-                ) : null}
+                {job.summary && <Text style={styles.workSummary}>{job.summary}</Text>}
+                {job.highlights && job.highlights.length > 0 && (
+                  <View style={styles.highlightsList}>
+                    {job.highlights.map((highlight, hi) => (
+                      <Text key={hi} style={styles.highlight}>• {highlight}</Text>
+                    ))}
+                  </View>
+                )}
+                {job.keywords && job.keywords.length > 0 && (
+                  <View style={styles.keywordChips}>
+                    {job.keywords.map((keyword, ki) => (
+                      <Text key={ki} style={styles.keywordChip}>{keyword}</Text>
+                    ))}
+                  </View>
+                )}
               </View>
             ))}
           </View>
-        ) : null}
+        )}
 
         {/* Education */}
-        {education.length > 0 ? (
+        {education.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Education</Text>
             {education.map((edu, i) => (
               <View key={i} style={styles.eduItem}>
                 <View style={styles.eduHeader}>
                   <Text style={styles.eduDegree}>
-                    {edu.degree}{edu.fieldOfStudy ? ` in ${edu.fieldOfStudy}` : ''}
+                    {edu.studyType} {edu.area ? `in ${edu.area}` : ''}
                   </Text>
                   <Text style={styles.eduInstitution}>{edu.institution}</Text>
                 </View>
                 <View style={styles.eduMeta}>
-                  <Text>{edu.location}</Text>
-                  <Text>
-                    {edu.startDate} - {edu.isOngoing ? 'Present' : (edu.endDate || '')}
-                  </Text>
+                  <Text>{edu.startDate}{edu.endDate ? ` - ${edu.endDate}` : ' - Present'}</Text>
+                  {edu.score && <Text>GPA: {edu.score}</Text>}
                 </View>
-                {(edu.gpa || edu.honors) ? (
-                  <View style={styles.eduDetails}>
-                    {edu.gpa ? <Text>GPA: {edu.gpa}</Text> : null}
-                    {edu.honors ? <Text>   {edu.honors}</Text> : null}
-                  </View>
-                ) : null}
+                {(edu.courses && edu.courses.length > 0) && (
+                  <Text style={styles.eduDetails}>
+                    Relevant Courses: {edu.courses.join(', ')}
+                  </Text>
+                )}
               </View>
             ))}
           </View>
-        ) : null}
+        )}
 
         {/* Skills */}
-        {data.sections.skills?.isVisible && skills.length > 0 ? (
+        {skills.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Skills</Text>
             <View style={styles.skillsWrap}>
-              {skills.map((s, i) => (
+              {skills.map((skill, i) => (
                 <Text key={i} style={styles.skillChip}>
-                  {s.name}{s.proficiency ? ` • ${s.proficiency}` : ''}{s.yearsOfExperience ? ` • ${s.yearsOfExperience} yrs` : ''}
+                  {skill.name}
+                  {skill.level && ` • ${skill.level}`}
                 </Text>
               ))}
             </View>
           </View>
-        ) : null}
+        )}
 
         {/* Projects */}
-        {projects.length > 0 ? (
+        {projects.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Projects</Text>
-            {projects.filter(p => p.isVisible !== false).map((p, i) => (
+            {projects.map((project, i) => (
               <View key={i} style={styles.projItem}>
                 <View style={styles.projHeader}>
-                  <Text style={styles.projName}>{p.name}</Text>
-                  {(p.startDate || p.endDate) ? (
+                  <Text style={styles.projName}>{project.name}</Text>
+                  {(project.startDate || project.endDate) && (
                     <Text style={styles.projDates}>
-                      {p.startDate || ''}{p.startDate && p.endDate ? ' - ' : ''}{p.endDate || ''}
+                      {project.startDate}{project.endDate ? ` - ${project.endDate}` : ''}
                     </Text>
-                  ) : null}
+                  )}
                 </View>
-                {p.description ? (
-                  <Text style={styles.projDesc}>{p.description}</Text>
-                ) : null}
-                {Array.isArray(p.technologies) && p.technologies.length > 0 ? (
-                  <View style={styles.projTechWrap}>
-                    {p.technologies.map((t, ti) => (
-                      <Text key={ti} style={styles.projTech}>{t}</Text>
+                {project.description && <Text style={styles.projDesc}>{project.description}</Text>}
+                {project.highlights && project.highlights.length > 0 && (
+                  <View style={styles.highlightsList}>
+                    {project.highlights.map((highlight, hi) => (
+                      <Text key={hi} style={styles.highlight}>• {highlight}</Text>
                     ))}
                   </View>
-                ) : null}
-                {Array.isArray(p.links) && p.links.length > 0 ? (
-                  <View style={styles.projLinks}>
-                    {p.links.map((l, li) => (
-                      <Link key={li} src={l.url} style={styles.projLink}>
-                        {l.label || l.url}
-                      </Link>
+                )}
+                {project.keywords && project.keywords.length > 0 && (
+                  <View style={styles.keywordChips}>
+                    {project.keywords.map((keyword, ki) => (
+                      <Text key={ki} style={styles.keywordChip}>{keyword}</Text>
                     ))}
                   </View>
-                ) : null}
+                )}
+                {project.url && (
+                  <Link src={project.url} style={styles.contactLink}>🔗 {project.url}</Link>
+                )}
               </View>
             ))}
           </View>
-        ) : null}
+        )}
+
+        {/* Volunteer Work */}
+        {volunteer.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Volunteer Experience</Text>
+            {volunteer.map((vol, i) => (
+              <View key={i} style={styles.volunteerItem}>
+                <View style={styles.volunteerHeader}>
+                  <Text style={styles.volunteerPosition}>{vol.position}</Text>
+                  <Text style={styles.volunteerOrg}>{vol.organization}</Text>
+                </View>
+                <View style={styles.workMeta}>
+                  <Text>{vol.location}</Text>
+                  <Text>{vol.startDate}{vol.endDate ? ` - ${vol.endDate}` : ' - Present'}</Text>
+                </View>
+                {vol.summary && <Text style={styles.workSummary}>{vol.summary}</Text>}
+                {vol.highlights && vol.highlights.length > 0 && (
+                  <View style={styles.highlightsList}>
+                    {vol.highlights.map((highlight, hi) => (
+                      <Text key={hi} style={styles.highlight}>• {highlight}</Text>
+                    ))}
+                  </View>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Awards & Achievements */}
+        {awards.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Awards & Achievements</Text>
+            {awards.map((award, i) => (
+              <View key={i} style={styles.awardItem}>
+                <View style={styles.workHeader}>
+                  <Text style={styles.awardTitle}>{award.title}</Text>
+                  <Text style={styles.awardDate}>{award.date}</Text>
+                </View>
+                <Text style={styles.awardAwarder}>{award.awarder}</Text>
+                {award.summary && <Text style={styles.workSummary}>{award.summary}</Text>}
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Languages */}
+        {languages.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Languages</Text>
+            {languages.map((lang, i) => (
+              <View key={i} style={styles.langItem}>
+                <Text style={styles.langName}>
+                  {lang.language} - <Text style={styles.langFluency}>{lang.fluency}</Text>
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Certifications */}
+        {certificates.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Certifications</Text>
+            {certificates.map((cert, i) => (
+              <View key={i} style={styles.certItem}>
+                <View style={styles.workHeader}>
+                  <Text style={styles.certName}>{cert.name}</Text>
+                  <Text style={styles.awardDate}>{cert.date}</Text>
+                </View>
+                <Text style={styles.certIssuer}>{cert.issuer}</Text>
+                {cert.url && (
+                  <Link src={cert.url} style={styles.contactLink}>🔗 Verify Certificate</Link>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Interests */}
+        {interests.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Interests</Text>
+            {interests.map((interest, i) => (
+              <View key={i} style={styles.interestItem}>
+                <Text style={styles.interestName}>{interest.name}</Text>
+                {interest.keywords && interest.keywords.length > 0 && (
+                  <Text style={styles.interestKeywords}>
+                    {interest.keywords.join(', ')}
+                  </Text>
+                )}
+                {interest.summary && <Text style={styles.workSummary}>{interest.summary}</Text>}
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Publications */}
+        {publications.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Publications</Text>
+            {publications.map((pub, i) => (
+              <View key={i} style={styles.pubItem}>
+                <View style={styles.workHeader}>
+                  <Text style={styles.pubName}>{pub.name}</Text>
+                  <Text style={styles.awardDate}>{pub.releaseDate}</Text>
+                </View>
+                <Text style={styles.pubPublisher}>{pub.publisher}</Text>
+                {pub.summary && <Text style={styles.workSummary}>{pub.summary}</Text>}
+                {pub.url && (
+                  <Link src={pub.url} style={styles.contactLink}>🔗 Read Publication</Link>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* References */}
+        {references.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>References</Text>
+            {references.map((ref, i) => (
+              <View key={i} style={styles.refItem}>
+                <Text style={styles.refName}>{ref.name}</Text>
+                <Text style={styles.refText}>"{ref.reference}"</Text>
+              </View>
+            ))}
+          </View>
+        )}
       </Page>
     </Document>
   );

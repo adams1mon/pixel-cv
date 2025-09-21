@@ -2,20 +2,34 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-// Section types following CV top-down structure
-export type CVSection = 'header' | 'summary' | 'experience' | 'education' | 'skills' | 'projects';
+// Section types following JsonResume standard - ALL 12 sections included
+export type JsonResumeSection = 
+  | 'basics' 
+  | 'work' 
+  | 'projects' 
+  | 'education' 
+  | 'skills' 
+  | 'volunteer' 
+  | 'awards' 
+  | 'languages' 
+  | 'certificates' 
+  | 'interests' 
+  | 'publications' 
+  | 'references';
 
 // Section configuration for navigation
 export interface SectionConfig {
-  id: CVSection;
+  id: JsonResumeSection;
   label: string;
+  description: string;
+  optional: boolean;
 }
 
 // UI Context interface
 interface UIContextType {
   // Section navigation
-  activeSection: CVSection;
-  setActiveSection: (section: CVSection) => void;
+  activeSection: JsonResumeSection;
+  setActiveSection: (section: JsonResumeSection) => void;
   
   // Sidebar state
   sidebarCollapsed: boolean;
@@ -26,14 +40,80 @@ interface UIContextType {
   sections: SectionConfig[];
 }
 
-// Section configuration following top-down CV structure
+// Section configuration following JsonResume standard - ALL 12 sections
 const SECTIONS: SectionConfig[] = [
-  { id: 'header', label: 'Personal Information'},
-  { id: 'summary', label: 'Professional Summary'},
-  { id: 'experience', label: 'Experience'},
-  { id: 'education', label: 'Education'},
-  { id: 'skills', label: 'Skills'},
-  { id: 'projects', label: 'Projects'},
+  { 
+    id: 'basics', 
+    label: 'Personal Information', 
+    description: 'Name, contact info, location, social profiles, and summary',
+    optional: false // Only required section in JsonResume
+  },
+  { 
+    id: 'work', 
+    label: 'Work Experience', 
+    description: 'Professional work history and achievements',
+    optional: true 
+  },
+  { 
+    id: 'projects', 
+    label: 'Projects', 
+    description: 'Personal and professional projects',
+    optional: true 
+  },
+  { 
+    id: 'education', 
+    label: 'Education', 
+    description: 'Academic background and qualifications',
+    optional: true 
+  },
+  { 
+    id: 'skills', 
+    label: 'Skills', 
+    description: 'Technical and professional skills',
+    optional: true 
+  },
+  { 
+    id: 'volunteer', 
+    label: 'Volunteer Work', 
+    description: 'Community service and volunteer experiences',
+    optional: true 
+  },
+  { 
+    id: 'awards', 
+    label: 'Awards & Achievements', 
+    description: 'Recognition and accomplishments',
+    optional: true 
+  },
+  { 
+    id: 'languages', 
+    label: 'Languages', 
+    description: 'Language proficiencies and fluency levels',
+    optional: true 
+  },
+  { 
+    id: 'certificates', 
+    label: 'Certifications', 
+    description: 'Professional certifications and licenses',
+    optional: true 
+  },
+  { 
+    id: 'interests', 
+    label: 'Interests & Hobbies', 
+    description: 'Personal interests and activities',
+    optional: true 
+  },
+  { 
+    id: 'publications', 
+    label: 'Publications', 
+    description: 'Articles, books, papers, and other publications',
+    optional: true 
+  },
+  { 
+    id: 'references', 
+    label: 'References', 
+    description: 'Professional references and testimonials',
+    optional: true 
+  },
 ];
 
 // Create context
@@ -45,8 +125,8 @@ interface UIProviderProps {
 }
 
 export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
-  // Section navigation state - default to first section (header)
-  const [activeSection, setActiveSection] = useState<CVSection>('header');
+  // Section navigation state - default to basics (the required JsonResume section)
+  const [activeSection, setActiveSection] = useState<JsonResumeSection>('basics');
   
   // Sidebar state - default to expanded for desktop
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
@@ -80,8 +160,3 @@ export const useUI = (): UIContextType => {
   }
   return context;
 };
-
-// Helper function to get section by id
-export const getSectionConfig = (sectionId: CVSection): SectionConfig | undefined => {
-  return SECTIONS.find(section => section.id === sectionId);
-}; 

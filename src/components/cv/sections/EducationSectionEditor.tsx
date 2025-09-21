@@ -2,276 +2,444 @@
 
 import React, { useState } from 'react';
 import { useCV } from '../../../contexts/CVContext';
-import { createEmptyEducation } from '../../../types/cv-data';
-import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
-
-const COMMON_DEGREES = [
-  { value: 'BSc', label: 'Bachelor of Science (BSc)' },
-  { value: 'BA', label: 'Bachelor of Arts (BA)' },
-  { value: 'BEng', label: 'Bachelor of Engineering (BEng)' },
-  { value: 'MSc', label: 'Master of Science (MSc)' },
-  { value: 'MA', label: 'Master of Arts (MA)' },
-  { value: 'MEng', label: 'Master of Engineering (MEng)' },
-  { value: 'MBA', label: 'Master of Business Administration (MBA)' },
-  { value: 'PhD', label: 'Doctor of Philosophy (PhD)' },
-  { value: 'MD', label: 'Doctor of Medicine (MD)' },
-  { value: 'JD', label: 'Juris Doctor (JD)' },
-  { value: 'other', label: 'Other' },
-];
+import { JsonResumeEducation, createEmptyEducation } from '../../../types/jsonresume';
+import { Plus, Trash2, ChevronDown, ChevronRight, GraduationCap, Calendar, MapPin, BookOpen } from 'lucide-react';
+import { InputField, TextArea } from './shared/InputField';
 
 export const EducationSectionEditor: React.FC = () => {
-  const { 
-    cvData, 
-    addEducation, 
-    updateSingleEducation, 
-    removeEducation 
-  } = useCV();
+  const { cvData, updateEducation } = useCV();
+  const [expandedEducation, setExpandedEducation] = useState<Set<number>>(new Set([0])); // First education expanded by default
 
-  // Track which education entries have expanded optional fields
-  const [expandedOptional, setExpandedOptional] = useState<Set<string>>(new Set());
+  const education = cvData.education || [];
 
-  // Helper to update education
-  const handleEducationUpdate = (index: number, field: string, value: any) => {
-    const education = cvData.sections.education[index];
-    if (education) {
-      updateSingleEducation(education.id, {
-        ...education,
-        [field]: value
-      });
-    }
-  };
-
-  // Add new education using context
-  const handleAddEducation = () => {
-    const newEducation = createEmptyEducation();
-    addEducation(newEducation);
-  };
-
-  // Remove education by index
-  const handleRemoveEducation = (index: number) => {
-    const education = cvData.sections.education[index];
-    if (education) {
-      removeEducation(education.id);
-    }
-  };
-
-  // Toggle optional fields for a specific education entry
-  const toggleOptionalFields = (educationId: string) => {
-    const newExpanded = new Set(expandedOptional);
-    if (newExpanded.has(educationId)) {
-      newExpanded.delete(educationId);
+  // Toggle expandable education entries
+  const toggleEducationExpanded = (index: number) => {
+    const newExpanded = new Set(expandedEducation);
+    if (newExpanded.has(index)) {
+      newExpanded.delete(index);
     } else {
-      newExpanded.add(educationId);
+      newExpanded.add(index);
     }
-    setExpandedOptional(newExpanded);
+    setExpandedEducation(newExpanded);
   };
 
-  // TODO: currently studying broken
+  // Education array management
+  const addEducation = () => {
+    const newEducation = createEmptyEducation();
+    const updatedEducation = [...education, newEducation];
+    updateEducation(updatedEducation);
+
+    // Expand the new education entry
+    setExpandedEducation(prev => new Set([...prev, updatedEducation.length - 1]));
+  };
+
+  const removeEducation = (index: number) => {
+    const updatedEducation = education.filter((_, i) => i !== index);
+    updateEducation(updatedEducation);
+    
+    // Update expanded set to account for removed item
+    const newExpanded = new Set<number>();
+    expandedEducation.forEach(expandedIndex => {
+      if (expandedIndex < index) {
+        newExpanded.add(expandedIndex);
+      } else if (expandedIndex > index) {
+        newExpanded.add(expandedIndex - 1);
+      }
+    });
+    setExpandedEducation(newExpanded);
+  };
+
+  const updateSingleEducation = (index: number, updates: Partial<JsonResumeEducation>) => {
+    const updatedEducation = education.map((eduItem, i) => 
+      i === index ? { ...eduItem, ...updates } : eduItem
+    );
+    updateEducation(updatedEducation);
+  };
+
+  // Courses management
+  const addCourse = (eduIndex: number) => {
+    const eduItem = education[eduIndex];
+    const courses = eduItem.courses || [];
+    updateSingleEducation(eduIndex, {
+      courses: [...courses, '']
+    });
+  };
+
+  const updateCourse = (eduIndex: number, courseIndex: number, value: string) => {
+    const eduItem = education[eduIndex];
+    const courses = [...(eduItem.courses || [])];
+    courses[courseIndex] = value;
+    updateSingleEducation(eduIndex, { courses });
+  };
+
+  const removeCourse = (eduIndex: number, courseIndex: number) => {
+    const eduItem = education[eduIndex];
+    const courses = (eduItem.courses || []).filter((_, i) => i !== courseIndex);
+    updateSingleEducation(eduIndex, { courses });
+  };
+
+  // Honors management
+  const addHonor = (eduIndex: number) => {
+    const eduItem = education[eduIndex];
+    const honors = eduItem.honors || [];
+    updateSingleEducation(eduIndex, {
+      honors: [...honors, '']
+    });
+  };
+
+  const updateHonor = (eduIndex: number, honorIndex: number, value: string) => {
+    const eduItem = education[eduIndex];
+    const honors = [...(eduItem.honors || [])];
+    honors[honorIndex] = value;
+    updateSingleEducation(eduIndex, { honors });
+  };
+
+  const removeHonor = (eduIndex: number, honorIndex: number) => {
+    const eduItem = education[eduIndex];
+    const honors = (eduItem.honors || []).filter((_, i) => i !== honorIndex);
+    updateSingleEducation(eduIndex, { honors });
+  };
+
+  // Activities management
+  const addActivity = (eduIndex: number) => {
+    const eduItem = education[eduIndex];
+    const activities = eduItem.activities || [];
+    updateSingleEducation(eduIndex, {
+      activities: [...activities, '']
+    });
+  };
+
+  const updateActivity = (eduIndex: number, activityIndex: number, value: string) => {
+    const eduItem = education[eduIndex];
+    const activities = [...(eduItem.activities || [])];
+    activities[activityIndex] = value;
+    updateSingleEducation(eduIndex, { activities });
+  };
+
+  const removeActivity = (eduIndex: number, activityIndex: number) => {
+    const eduItem = education[eduIndex];
+    const activities = (eduItem.activities || []).filter((_, i) => i !== activityIndex);
+    updateSingleEducation(eduIndex, { activities });
+  };
 
   return (
-    <div className="section-editor">
-      <div className="mb-6">
-        <div className="flex flex-col justify-between items-start">
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Education</h2>
-          <p className="text-sm text-gray-600">Your academic background, degrees, and educational achievements.</p>
-        </div>
+    <div className="section-editor max-w-4xl">
+      {/* Header */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Education</h2>
+        <p className="text-gray-600">
+          Your academic background, qualifications, and educational achievements.
+        </p>
       </div>
       
       <div className="space-y-6">
-        {cvData.sections.education.length === 0 ? (
-          <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
-            <div className="max-w-sm mx-auto">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No education entries yet</h3>
-              <p className="text-gray-500 mb-4">Add your first educational background to get started.</p>
+        {education.length === 0 ? (
+          <div className="text-center py-12 bg-gray-50 rounded-lg">
+            <GraduationCap className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No education added yet</h3>
+            <p className="text-gray-600 mb-6">Add your educational background to showcase your qualifications.</p>
               <button
-                onClick={handleAddEducation}
-                className="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-1 font-medium transition-colors"
+              type="button"
+              onClick={addEducation}
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Education
+              <Plus className="w-5 h-5 mr-2" />
+              Add First Education
               </button>
-            </div>
           </div>
         ) : (
           <>
-            {cvData.sections.education.map((edu, index) => (
-              <div key={edu.id} className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-medium text-gray-800">Education #{index + 1}</h3>
-                  <button
-                    onClick={() => handleRemoveEducation(index)}
-                    className="flex items-center text-red-600 hover:text-red-800 text-sm font-medium transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4 mr-1" />
-                    Remove
-                  </button>
-                </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Institution</label>
-                  <input
-                    type="text"
-                    value={edu.institution}
-                    onChange={(e) => handleEducationUpdate(index, 'institution', e.target.value)}
-                    className="w-full text-black px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="University name"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Degree</label>
-                  <select
-                    value={edu.degree}
-                    onChange={(e) => handleEducationUpdate(index, 'degree', e.target.value)}
-                    className="w-full text-black px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Select degree</option>
-                    {COMMON_DEGREES.map((degree) => (
-                      <option key={degree.value} value={degree.value}>
-                        {degree.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Custom degree field - only show if "other" is selected */}
-                {edu.degree === 'other' && (
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Custom Degree</label>
-                    <input
-                      type="text"
-                      value={edu.fieldOfStudy} // We'll use fieldOfStudy to store custom degree temporarily
-                      onChange={(e) => handleEducationUpdate(index, 'fieldOfStudy', e.target.value)}
-                      className="w-full text-black px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Enter your degree title"
-                    />
-                  </div>
-                )}
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Field of Study</label>
-                  <input
-                    type="text"
-                    value={edu.degree === 'other' ? '' : edu.fieldOfStudy}
-                    onChange={(e) => handleEducationUpdate(index, 'fieldOfStudy', e.target.value)}
-                    className="w-full text-black px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="e.g. Computer Science"
-                    disabled={edu.degree === 'other'}
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Location</label>
-                  <input
-                    type="text"
-                    value={edu.location}
-                    onChange={(e) => handleEducationUpdate(index, 'location', e.target.value)}
-                    className="w-full text-black px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="City, Country"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Start Date</label>
-                  <input
-                    type="text"
-                    value={edu.startDate}
-                    onChange={(e) => handleEducationUpdate(index, 'startDate', e.target.value)}
-                    placeholder="2020-09"
-                    className="w-full text-black px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                
-                <div className="md:col-span-2">
-                  <div className="flex items-center mb-3">
-                    <input
-                      id={`ongoing-${edu.id}`}
-                      type="checkbox"
-                      checked={edu.isOngoing}
-                      onChange={(e) => {
-                        handleEducationUpdate(index, 'isOngoing', e.target.checked);
-                        if (e.target.checked) {
-                          handleEducationUpdate(index, 'endDate', null);
-                        }
-                      }}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-3"
-                    />
-                    <label htmlFor={`ongoing-${edu.id}`} className="text-sm font-medium text-gray-700">
-                      Currently studying
-                    </label>
-                  </div>
-                  
-                  {!edu.isOngoing && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">End Date</label>
-                      <input
-                        type="text"
-                        value={edu.endDate || ''}
-                        onChange={(e) => handleEducationUpdate(index, 'endDate', e.target.value || null)}
-                        placeholder="2024-06"
-                        className="w-full text-black px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Optional Fields - Collapsible */}
-              <div className="mt-4 border-t border-gray-200 pt-4">
-                <button
-                  onClick={() => toggleOptionalFields(edu.id)}
-                  className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  {expandedOptional.has(edu.id) ? (
-                    <ChevronUp className="w-4 h-4 mr-1" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 mr-1" />
-                  )}
-                  Additional Details
-                </button>
-
-                {expandedOptional.has(edu.id) && (
-                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">GPA</label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="4"
-                        value={edu.gpa || ''}
-                        onChange={(e) => handleEducationUpdate(index, 'gpa', e.target.value ? parseFloat(e.target.value) : undefined)}
-                        className="w-full text-black px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="3.8"
-                      />
+            {education.map((eduItem, index) => (
+              <div key={index} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                {/* Education Header */}
+                <div className="bg-gray-50 px-6 py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <GraduationCap className="w-5 h-5 text-blue-600 mr-3" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {eduItem.studyType && eduItem.area ? `${eduItem.studyType} in ${eduItem.area}` :
+                           eduItem.studyType || eduItem.area || 'New Education'}
+                          {eduItem.institution && ` at ${eduItem.institution}`}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          Education #{index + 1}
+                        </p>
+                      </div>
                     </div>
                     
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Honors</label>
-                      <input
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => toggleEducationExpanded(index)}
+                        className="flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md"
+                      >
+                        {expandedEducation.has(index) ? (
+                          <>
+                            <ChevronDown className="w-4 h-4 mr-1" />
+                            Collapse
+                          </>
+                        ) : (
+                          <>
+                            <ChevronRight className="w-4 h-4 mr-1" />
+                            Expand
+                          </>
+                        )}
+                      </button>
+                      
+                  <button
+                        type="button"
+                        onClick={() => removeEducation(index)}
+                        className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
+                        aria-label="Remove education"
+                  >
+                        <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                  </div>
+                </div>
+                
+                {/* Education Details */}
+                {expandedEducation.has(index) && (
+                  <div className="p-6 space-y-8">
+                    {/* Basic Information */}
+                    <div className="space-y-6">
+                      <div className="flex items-center mb-4">
+                        <BookOpen className="w-5 h-5 text-blue-600 mr-2" />
+                        <h4 className="text-lg font-semibold text-gray-900">Institution & Program</h4>
+                </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <InputField
+                          label="Institution"
+                          value={eduItem.institution || ''}
+                          onChange={(value) => updateSingleEducation(index, { institution: value })}
+                          placeholder="e.g., University of California, Berkeley"
+                          required={true}
+                        />
+                        
+                        <InputField
+                          label="Field of Study"
+                          value={eduItem.area || ''}
+                          onChange={(value) => updateSingleEducation(index, { area: value })}
+                          placeholder="e.g., Computer Science, Business Administration, Psychology"
+                          helpText="Your major, specialization, or field of study"
+                  />
+                </div>
+                
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <InputField
+                          label="Degree/Qualification"
+                          value={eduItem.studyType || ''}
+                          onChange={(value) => updateSingleEducation(index, { studyType: value })}
+                          placeholder="e.g., Bachelor's, Master's, PhD, Diploma, Certificate"
+                          helpText="Type of degree or qualification earned"
+                        />
+                        
+                        <InputField
+                          label="Academic Score"
+                          value={eduItem.score || ''}
+                          onChange={(value) => updateSingleEducation(index, { score: value })}
+                          placeholder="e.g., 3.8, First Class, 85%, A, Distinction"
+                          helpText="Optional: Your grade or academic achievement"
+                  />
+                      </div>
+                </div>
+                
+                    {/* Timeline */}
+                    <div className="space-y-6">
+                      <div className="flex items-center mb-4">
+                        <Calendar className="w-5 h-5 text-blue-600 mr-2" />
+                        <h4 className="text-lg font-semibold text-gray-900">Duration</h4>
+                </div>
+                
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <InputField
+                          label="Start Date"
+                          value={eduItem.startDate || ''}
+                          onChange={(value) => updateSingleEducation(index, { startDate: value })}
+                          type="text"
+                          placeholder="YYYY-MM"
+                          helpText="Format: YYYY-MM (e.g., 2019-09)"
+                    />
+                        
+                        <InputField
+                          label="End Date"
+                          value={eduItem.endDate || ''}
+                          onChange={(value) => updateSingleEducation(index, { endDate: value })}
                         type="text"
-                        value={edu.honors || ''}
-                        onChange={(e) => handleEducationUpdate(index, 'honors', e.target.value || undefined)}
-                        className="w-full text-black px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="e.g. Magna Cum Laude"
-                      />
+                          placeholder="YYYY-MM (leave empty if ongoing)"
+                          helpText="Leave empty for current studies"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Relevant Courses */}
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-lg font-semibold text-gray-900">Relevant Courses</h4>
+                        <button
+                          type="button"
+                          onClick={() => addCourse(index)}
+                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Add Course
+                        </button>
+                      </div>
+                      
+                      {(eduItem.courses || []).length === 0 ? (
+                        <div className="text-center py-6 text-gray-500">
+                          <p className="mb-3">No courses added yet</p>
+                          <button
+                            type="button"
+                            onClick={() => addCourse(index)}
+                            className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                          >
+                            Add relevant coursework
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {(eduItem.courses || []).map((course, cIndex) => (
+                            <div key={cIndex} className="flex gap-3">
+                              <div className="flex-1">
+                                <InputField
+                                  label={`Course ${cIndex + 1}`}
+                                  value={course}
+                                  onChange={(value) => updateCourse(index, cIndex, value)}
+                                  placeholder="e.g., Advanced Statistics, Organic Chemistry"
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => removeCourse(index, cIndex)}
+                                className="mt-8 p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
+                                aria-label="Remove course"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                    </div>
+                  )}
+                </div>
+
+                    {/* Academic Honors */}
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-lg font-semibold text-gray-900">Academic Honors & Awards</h4>
+                        <button
+                          type="button"
+                          onClick={() => addHonor(index)}
+                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Add Honor
+                        </button>
+              </div>
+
+                      {(eduItem.honors || []).length === 0 ? (
+                        <div className="text-center py-6 text-gray-500">
+                          <p className="mb-3">No honors added yet</p>
+                <button
+                            type="button"
+                            onClick={() => addHonor(index)}
+                            className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                          >
+                            Add academic honors or recognition
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {(eduItem.honors || []).map((honor, hIndex) => (
+                            <div key={hIndex} className="flex gap-3">
+                              <div className="flex-1">
+                                <InputField
+                                  label={`Honor ${hIndex + 1}`}
+                                  value={honor}
+                                  onChange={(value) => updateHonor(index, hIndex, value)}
+                                  placeholder="e.g., Dean's List, Magna Cum Laude, Academic Excellence Award"
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => removeHonor(index, hIndex)}
+                                className="mt-8 p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
+                                aria-label="Remove honor"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Extracurricular Activities */}
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-lg font-semibold text-gray-900">Activities & Leadership</h4>
+                        <button
+                          type="button"
+                          onClick={() => addActivity(index)}
+                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Add Activity
+                        </button>
+                      </div>
+                      
+                      {(eduItem.activities || []).length === 0 ? (
+                        <div className="text-center py-6 text-gray-500">
+                          <p className="mb-3">No activities added yet</p>
+                          <button
+                            type="button"
+                            onClick={() => addActivity(index)}
+                            className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                          >
+                            Add extracurricular activities or leadership roles
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {(eduItem.activities || []).map((activity, aIndex) => (
+                            <div key={aIndex} className="flex gap-3">
+                              <div className="flex-1">
+                                <InputField
+                                  label={`Activity ${aIndex + 1}`}
+                                  value={activity}
+                                  onChange={(value) => updateActivity(index, aIndex, value)}
+                                  placeholder="e.g., Student Council President, Debate Team, Research Assistant"
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => removeActivity(index, aIndex)}
+                                className="mt-8 p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
+                                aria-label="Remove activity"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
-                </div>
              </div>
            ))}
 
-           <div className="w-full flex justify-center">
+            {/* Add New Education Button */}
              <button
-               onClick={handleAddEducation}
-               className="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-1 font-medium transition-colors"
+              type="button"
+              onClick={addEducation}
+              className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-colors"
              >
-               <Plus className="w-4 h-4 mr-2" />
-               Add Education
+              <Plus className="w-5 h-5 inline mr-2" />
+              Add Another Education
              </button>
-           </div>
          </>
         )}
        </div>

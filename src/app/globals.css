@@ -19,6 +19,8 @@
   }
 }
 
+/* TODO: design tokens */
+
 body {
   background: var(--background);
   color: var(--foreground);

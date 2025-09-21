@@ -147,17 +147,17 @@ export const createEmptyCV = (): CVData => ({
 
 export const createEmptyHeader = (): HeaderData => ({
   personalInfo: {
-    firstName: '',
-    lastName: '',
-    title: '',
-    location: ''
+    firstName: 'John',
+    lastName: 'Doe',
+    title: 'Software Engineer',
+    location: '127.0.0.1'
   },
   contact: {
-    email: '',
-    phone: '',
-    website: '',
-    linkedin: '',
-    github: ''
+    email: 'doe@themoe.com',
+    phone: 'call me',
+    website: 'https://slimptr.blog',
+    linkedin: 'hello',
+    github: 'github'
   }
 });
 
