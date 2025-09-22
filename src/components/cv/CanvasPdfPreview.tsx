@@ -143,7 +143,6 @@ export const CanvasPdfPreview: React.FC<CanvasPdfPreviewProps> = ({
           <Document
             // changing key every time the doc loads to prevent some error
             // https://github.com/wojtekmaj/react-pdf/issues/974
-            key={`cv-${numPages}`}
             className="h-full px-2 overflow-auto"
             file={instance.blob}
             onLoadSuccess={onLoadSuccess}

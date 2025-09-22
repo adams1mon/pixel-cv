@@ -3,7 +3,7 @@
 import React, { ReactNode } from 'react';
 
 interface InputFieldProps {
-  label: string;
+  label?: string;
   value: string;
   onChange: (value: string) => void;
   type?: 'text' | 'email' | 'tel' | 'url' | 'password' | 'number';
@@ -52,10 +52,12 @@ export const InputField: React.FC<InputFieldProps> = ({
 
   return (
     <div className={`w-full ${containerClassName}`}>
-      <label className={labelClasses}>
-        {icon && <span className="inline-flex items-center">{icon}</span>}
-        {label}
-      </label>
+      {label && 
+        <label className={labelClasses}>
+          {icon && <span className="inline-flex items-center">{icon}</span>}
+          {label}
+        </label>
+      }
       
       {multiline ? (
         <textarea

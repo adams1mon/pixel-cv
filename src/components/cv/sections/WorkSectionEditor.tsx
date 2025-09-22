@@ -291,7 +291,6 @@ export const WorkSectionEditor: React.FC = () => {
                           value={workItem.description || ''}
                           onChange={(value) => updateSingleWork(index, { description: value })}
                           placeholder="Brief description of the company or department"
-                          helpText="Optional: Help context about the organization"
                         />
                       </div>
                     </div>

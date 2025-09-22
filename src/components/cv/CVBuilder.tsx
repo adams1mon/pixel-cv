@@ -7,7 +7,7 @@ import { Sidebar } from './Sidebar';
 import { SectionRouter } from './SectionRouter';
 import { ModernReactPdf } from '../templates/ModernReactPdf';
 
-import { usePDF } from '@react-pdf/renderer';
+import { pdf } from '@react-pdf/renderer';
 
 
 import dynamic from 'next/dynamic';
@@ -31,8 +31,10 @@ export const CVBuilder: React.FC = () => {
     <ModernReactPdf data={cvData} />
   );
 
-  // PDF instance - lifted from CanvasPdfPreview
-  const [pdfInstance, updatePdf] = usePDF({ document: debouncedCvDoc });
+  // Blob state generated imperatively
+  const [pdfBlob, setPdfBlob] = React.useState<Blob | null>(null);
+  const [isGenerating, setIsGenerating] = React.useState(false);
+  const [genError, setGenError] = React.useState<unknown>(null);
 
   useEffect(() => {
     console.log("cv data update");
@@ -47,17 +49,31 @@ export const CVBuilder: React.FC = () => {
     return () => clearTimeout(timeoutId);
   }, [cvData]);
 
-  // Update PDF when debounced document changes
   useEffect(() => {
-    if (debouncedCvDoc) {
-      updatePdf(debouncedCvDoc);
+    let cancelled = false;
+    async function generate() {
+      if (!debouncedCvDoc) return;
+      try {
+        setIsGenerating(true);
+        setGenError(null);
+        const blob = await pdf(debouncedCvDoc).toBlob();
+        if (!cancelled) setPdfBlob(blob);
+      } catch (err) {
+        setGenError(err);
+      } finally {
+        setIsGenerating(false);
+      }
     }
-  }, [debouncedCvDoc, updatePdf]);
+    generate();
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedCvDoc]);
 
   // Download function using existing PDF blob
   const downloadPdf = () => {
-    if (pdfInstance.blob) {
-      const url = URL.createObjectURL(pdfInstance.blob);
+    if (pdfBlob) {
+      const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `${cvData.metadata.title || 'CV'}.pdf`;
@@ -92,13 +108,13 @@ export const CVBuilder: React.FC = () => {
 
               <button 
                 onClick={downloadPdf}
-                disabled={!!(pdfInstance.loading || pdfInstance.error || !pdfInstance.blob)}
+                disabled={!!(isGenerating || genError || !pdfBlob)}
                 className={clsx(
                   "flex items-center gap-2 px-3 py-1 text-white text-sm font-medium rounded-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-1 transition-colors",
-                  pdfInstance.loading || pdfInstance.error || !pdfInstance.blob ? "bg-gray-600" : "bg-blue-600 hover:bg-blue-700"
+                  isGenerating || genError || !pdfBlob ? "bg-gray-600" : "bg-blue-600 hover:bg-blue-700"
                 )}
               >
-                {pdfInstance.loading ?
+                {isGenerating ?
                 <Loader2 className="w-4 h-4 animate-spin" />
                 :
                 <Download className="w-4 h-4" />
@@ -123,7 +139,12 @@ export const CVBuilder: React.FC = () => {
         {/* Right Side - React-PDF Preview */}
         <div className="h-full flex-1 p-2 shadow-sm overflow-hidden bg-gray-500">
           <CanvasPdfPreview
-            pdfInstance={pdfInstance}
+            pdfInstance={{
+              blob: pdfBlob,
+              loading: isGenerating,
+              error: genError,
+              document: debouncedCvDoc,
+            }}
             // width={300}
             initialScale={1}
           />
