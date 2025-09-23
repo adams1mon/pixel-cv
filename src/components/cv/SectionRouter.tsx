@@ -10,7 +10,11 @@ import { SkillsSectionEditor } from './sections/SkillsSectionEditor';
 import { ProjectsSectionEditor } from './sections/ProjectsSectionEditor';
 import { LanguagesSectionEditor } from './sections/LanguagesSectionEditor';
 import { PublicationsSectionEditor } from './sections/PublicationsSectionEditor';
+import { AwardsSectionEditor } from './sections/AwardsSectionEditor';
 import { VolunteerSectionEditor } from './sections/VolunteerSectionEditor';
+import { CertificatesSectionEditor } from './sections/CertificatesSectionEditor';
+import { InterestsSectionEditor } from './sections/InterestsSectionEditor';
+import { ReferencesSectionEditor } from './sections/ReferencesSectionEditor';
 
 // Placeholder component for sections that don't exist yet
 const PlaceholderSectionEditor: React.FC<{ sectionName: string; description: string }> = ({ sectionName, description }) => (
@@ -36,71 +40,49 @@ export const SectionRouter: React.FC = () => {
 
   const renderActiveSection = () => {
     switch (activeSection) {
-      // Basics section - uses the new comprehensive BasicsSectionEditor
       case 'basics':
         return <BasicsSectionEditor />;
       
-      // Work section - uses the new comprehensive WorkSectionEditor
       case 'work':
         return <WorkSectionEditor />;
       
-      // Projects section - direct mapping
       case 'projects':
         return <ProjectsSectionEditor />;
       
-      // Education section - direct mapping
       case 'education':
         return <EducationSectionEditor />;
       
-      // Skills section - direct mapping
       case 'skills':
         return <SkillsSectionEditor />;
       
-      // New JsonResume sections - placeholders for now
       case 'volunteer':
         return <VolunteerSectionEditor />;
       
       case 'awards':
-        return (
-          <PlaceholderSectionEditor 
-            sectionName="Awards & Achievements" 
-            description="Recognition and accomplishments"
-          />
-        );
+        return <AwardsSectionEditor />;
       
       case 'languages':
         return <LanguagesSectionEditor />;
       
       case 'certificates':
-        return (
-          <PlaceholderSectionEditor 
-            sectionName="Certifications" 
-            description="Professional certifications and licenses"
-          />
-        );
+        return <CertificatesSectionEditor />;
       
       case 'interests':
-        return (
-          <PlaceholderSectionEditor 
-            sectionName="Interests & Hobbies" 
-            description="Personal interests and activities"
-          />
-        );
+        return <InterestsSectionEditor />;
       
       case 'publications':
         return <PublicationsSectionEditor />;
       
       case 'references':
+        return <ReferencesSectionEditor />;
+      
+      default:
         return (
-          <PlaceholderSectionEditor 
-            sectionName="References" 
-            description="Professional references and testimonials"
+          <PlaceholderSectionEditor
+            sectionName={activeSection}
+            description="This section is not implemented..."
           />
         );
-      
-      // Default fallback to basics
-      default:
-        return <BasicsSectionEditor />;
     }
   };
 

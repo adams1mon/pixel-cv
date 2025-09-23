@@ -6,6 +6,7 @@ import { useCV } from '../../contexts/CVContext';
 import { Sidebar } from './Sidebar';
 import { SectionRouter } from './SectionRouter';
 import { ModernReactPdf } from '../templates/ModernReactPdf';
+import { jsonResumeSample } from './jsonresume-sample';
 
 import { pdf } from '@react-pdf/renderer';
 
@@ -24,7 +25,7 @@ const headerSize = 40;
 
 // Main content component that uses the CV context
 export const CVBuilder: React.FC = () => {
-  const { cvData } = useCV();
+  const { cvData, importFromJson } = useCV();
   
   // Debounced PDF document state
   const [debouncedCvDoc, setDebouncedCvDoc] = React.useState<React.ReactElement<any>>(
@@ -105,6 +106,13 @@ export const CVBuilder: React.FC = () => {
               <span>•</span>
               <span>Auto-preview enabled</span>
               <span>•</span>
+
+              <button
+                onClick={() => importFromJson(JSON.stringify(jsonResumeSample))}
+                className="px-3 py-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-1"
+              >
+                Load Sample
+              </button>
 
               <button 
                 onClick={downloadPdf}

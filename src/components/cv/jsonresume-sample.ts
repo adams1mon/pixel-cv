@@ -5,7 +5,7 @@
 
 // TODO: use jsonresume
 
-export const resume = {
+export const jsonResumeSample = {
   "basics": {
     "name": "Samantha Jones",
     "label": "Software Developer",

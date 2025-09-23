@@ -25,15 +25,15 @@ const styles = StyleSheet.create({
   // Header styles
   header: {
     textAlign: 'center',
-    marginBottom: 24,
-    paddingBottom: 16,
-    borderBottomWidth: 2,
-    borderBottomColor: '#3b82f6'
+    marginBottom: 18,
+    // paddingBottom: 16,
+    // borderBottomWidth: 2,
+    // borderBottomColor: '#3b82f6'
   },
   name: {
     fontSize: 28,
     fontWeight: 700,
-    marginBottom: 6,
+    marginBottom: 20,
     color: '#1f2937'
   },
   label: {
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 6
+    marginTop: 2
   },
   contactText: {
     fontSize: 10,
@@ -330,7 +330,6 @@ const styles = StyleSheet.create({
   refText: {
     fontSize: 10,
     color: '#4b5563',
-    fontStyle: 'italic',
     lineHeight: 1.3
   }
 });

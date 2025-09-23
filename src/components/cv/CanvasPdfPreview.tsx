@@ -100,7 +100,7 @@ export const CanvasPdfPreview: React.FC<CanvasPdfPreviewProps> = ({
         :
         <>
           {/* Overlay controls - appear on hover */}
-          <div className="absolute bottom-3 pointer-events-auto w-full z-10">
+          <div className="absolute bottom-6 pointer-events-auto w-full z-10">
             <div className="w-48 flex items-center justify-center gap-1 mx-auto border-2 rounded-md bg-white/70 backdrop-blur-sm shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={zoomOut}
@@ -143,7 +143,7 @@ export const CanvasPdfPreview: React.FC<CanvasPdfPreviewProps> = ({
           <Document
             // changing key every time the doc loads to prevent some error
             // https://github.com/wojtekmaj/react-pdf/issues/974
-            className="h-full px-2 overflow-auto"
+            className="h-full px-2 overflow-auto pb-12"
             file={instance.blob}
             onLoadSuccess={onLoadSuccess}
             loading={<PdfLoading />}

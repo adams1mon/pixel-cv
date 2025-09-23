@@ -1,34 +1,31 @@
 'use client';
 
 import React, { useState } from 'react';
-import { JsonResumePublication } from '@/types/jsonresume';
-import { BookOpen, Calendar, FileText, Trash2, ChevronDown, ChevronRight, BookCheck } from 'lucide-react';
+import { JsonResumeCertificate } from '@/types/jsonresume';
+import { BadgeCheck, Calendar, Globe, Link, FileText, Trash2, ChevronDown, ChevronRight, FileBadge } from 'lucide-react';
 import { InputField, UrlField, TextArea } from './InputField';
-import { KeywordsEntry } from './KeywordsEntry';
 
-interface PublicationEntryProps {
-  publication: JsonResumePublication;
+interface CertificateEntryProps {
+  certificate: JsonResumeCertificate;
   index: number;
-  onPublicationChange: (publication: JsonResumePublication) => void;
+  onCertificateChange: (certificate: JsonResumeCertificate) => void;
   onRemove: () => void;
 }
 
-export const PublicationEntry: React.FC<PublicationEntryProps> = ({
-  publication,
+export const CertificateEntry: React.FC<CertificateEntryProps> = ({
+  certificate,
   index,
-  onPublicationChange,
+  onCertificateChange,
   onRemove
 }) => {
   const [isExpanded, setIsExpanded] = useState(index === 0); // First entry expanded by default
 
-  const updateField = (field: keyof JsonResumePublication, value: any) => {
-    onPublicationChange({
-      ...publication,
+  const updateField = (field: keyof JsonResumeCertificate, value: any) => {
+    onCertificateChange({
+      ...certificate,
       [field]: value
     });
   };
-
-  const keywordsCount = (publication.keywords || []).length;
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
@@ -36,15 +33,14 @@ export const PublicationEntry: React.FC<PublicationEntryProps> = ({
       <div className="bg-gray-50 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center min-w-0">
-            <BookCheck className="w-5 h-5 text-blue-600 mr-3" />
+            <FileBadge className="w-5 h-5 text-blue-600 mr-3" />
             <div className="min-w-0">
               <h3 className="text-lg font-semibold text-gray-900 truncate">
-                {publication.name || 'New Publication'}
+                {certificate.name || 'New Certificate'}
               </h3>
               <p className="text-sm text-gray-600 truncate">
-                {publication.publisher ? publication.publisher : 'Publisher not set'}
-                {publication.releaseDate ? ` • ${publication.releaseDate}` : ''}
-                {keywordsCount > 0 && ` • ${keywordsCount} keyword${keywordsCount !== 1 ? 's' : ''}`}
+                {certificate.issuer ? certificate.issuer : 'Issuer not set'}
+                {certificate.date ? ` • ${certificate.date}` : ''}
               </p>
             </div>
           </div>
@@ -72,7 +68,7 @@ export const PublicationEntry: React.FC<PublicationEntryProps> = ({
               type="button"
               onClick={onRemove}
               className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
-              aria-label="Remove publication"
+              aria-label="Remove certificate"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -85,81 +81,73 @@ export const PublicationEntry: React.FC<PublicationEntryProps> = ({
         <div className="p-6 space-y-8">
           {/* Basic Information */}
           <div className="space-y-4">
-            <div className="flex items-center mb-2">
-              <BookOpen className="w-5 h-5 text-blue-600 mr-2" />
-              <h4 className="text-lg font-semibold text-gray-900">Publication</h4>
+            <div className="flex items-center mb-1">
+              <BadgeCheck className="w-5 h-5 text-blue-600 mr-2" />
+              <h4 className="text-lg font-semibold text-gray-900">Certificate</h4>
             </div>
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InputField
-                label="Publication Title"
-                value={publication.name || ''}
+                label="Name"
+                value={certificate.name || ''}
                 onChange={(value) => updateField('name', value)}
-                placeholder="e.g., Advanced Machine Learning Techniques"
+                placeholder="e.g., AWS Certified Solutions Architect"
                 required={true}
               />
               
               <InputField
-                label="Publisher"
-                value={publication.publisher || ''}
-                onChange={(value) => updateField('publisher', value)}
-                placeholder="e.g., ACM, IEEE, Nature Publishing"
+                label="Issuer"
+                value={certificate.issuer || ''}
+                onChange={(value) => updateField('issuer', value)}
+                placeholder="e.g., Amazon Web Services"
                 required={true}
               />
             </div>
           </div>
 
-          {/* Date and Links */}
+          {/* Date & Links */}
           <div className="space-y-4">
-            <div className="flex items-center mb-2">
+            <div className="flex items-center mb-1">
               <Calendar className="w-5 h-5 text-blue-600 mr-2" />
-              <h4 className="text-lg font-semibold text-gray-900">Dates & Links</h4>
+              <h4 className="text-lg font-semibold text-gray-900">Date & Links</h4>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InputField
-                label="Release Date"
-                value={publication.releaseDate || ''}
-                onChange={(value) => updateField('releaseDate', value)}
+                label="Date"
+                value={certificate.date || ''}
+                onChange={(value) => updateField('date', value)}
                 placeholder="YYYY-MM-DD"
               />
               
               <UrlField
-                label="Publisher Website"
-                value={publication.website || ''}
+                label="Website"
+                value={certificate.website || ''}
                 onChange={(value) => updateField('website', value)}
-                placeholder="https://publisher.com"
+                placeholder="https://issuer.com"
               />
-              
+
               <UrlField
                 containerClassName="col-span-1 md:col-span-2"
-                label="Publication URL"
-                value={publication.url || ''}
+                label="Verification URL"
+                value={certificate.url || ''}
                 onChange={(value) => updateField('url', value)}
-                placeholder="https://link-to-publication.com"
+                placeholder="https://verify-certificate.com/xyz"
               />
             </div>
           </div>
 
-          {/* Summary */}
+          {/* Notes (Optional) */}
           <div className="space-y-3">
             <div className="flex items-center mb-1">
               <FileText className="w-5 h-5 text-blue-600 mr-2" />
-              <h4 className="text-lg font-semibold text-gray-900">Summary</h4>
+              <h4 className="text-lg font-semibold text-gray-900">Notes</h4>
             </div>
             <TextArea
-              value={publication.summary || ''}
-              onChange={(value) => updateField('summary', value)}
-              placeholder="Brief description of the publication, its significance, and key findings..."
-              helpText="Describe the publication's content, methodology, and impact"
-              rows={4}
+              value={(certificate as any).notes || ''}
+              onChange={(value) => updateField('summary' as any, value)}
+              placeholder="Optional: Add notes such as credential ID, specialization, or scope..."
+              rows={3}
             />
           </div>
-
-          {/* Keywords */}
-          <KeywordsEntry
-            keywords={publication.keywords || []}
-            onKeywordsChange={(keywords) => updateField('keywords', keywords)}
-            skillName="publication"
-          />
         </div>
       )}
     </div>

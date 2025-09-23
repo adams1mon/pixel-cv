@@ -195,7 +195,7 @@ export const WorkSectionEditor: React.FC = () => {
                         <h4 className="text-lg font-semibold text-gray-900">Company & Role</h4>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-3">
                         <InputField
                           label="Job Title"
                           value={workItem.position || ''}
@@ -219,7 +219,6 @@ export const WorkSectionEditor: React.FC = () => {
                           value={workItem.location || ''}
                           onChange={(value) => updateSingleWork(index, { location: value })}
                           placeholder="e.g., San Francisco, CA"
-                          icon={<MapPin className="inline w-4 h-4 mr-1" />}
                         />
                         
                         <UrlField
@@ -326,7 +325,6 @@ export const WorkSectionEditor: React.FC = () => {
                             <div key={hIndex} className="flex gap-3">
                               <div className="flex-1">
                                 <InputField
-                                  label={`Achievement ${hIndex + 1}`}
                                   value={highlight}
                                   onChange={(value) => updateHighlight(index, hIndex, value)}
                                   placeholder="e.g., Increased team productivity by 30% through process improvements"
@@ -374,10 +372,9 @@ export const WorkSectionEditor: React.FC = () => {
                       ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           {(workItem.keywords || []).map((keyword, kIndex) => (
-                            <div key={kIndex} className="flex gap-3">
+                            <div key={kIndex} className="flex gap-1 items-center">
                               <div className="flex-1">
                                 <InputField
-                                  label={`Technology ${kIndex + 1}`}
                                   value={keyword}
                                   onChange={(value) => updateKeyword(index, kIndex, value)}
                                   placeholder="e.g., React, Python, AWS"
@@ -386,7 +383,7 @@ export const WorkSectionEditor: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => removeKeyword(index, kIndex)}
-                                className="mt-8 p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
+                                className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
                                 aria-label="Remove technology"
                               >
                                 <Trash2 className="w-4 h-4" />

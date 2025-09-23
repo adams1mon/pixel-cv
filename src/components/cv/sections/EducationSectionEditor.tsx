@@ -300,7 +300,7 @@ export const EducationSectionEditor: React.FC = () => {
                           </button>
                         </div>
                       ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="space-y-3">
                           {(eduItem.courses || []).map((course, cIndex) => (
                             <div key={cIndex} className="flex gap-3">
                               <div className="flex-1">

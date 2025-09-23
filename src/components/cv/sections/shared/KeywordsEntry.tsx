@@ -65,10 +65,6 @@ export const KeywordsEntry: React.FC<KeywordsEntryProps> = ({
         </button>
       </div>
       
-      <p className="text-sm text-gray-600">
-        Add related technologies, tools, frameworks, or concepts associated with this skill.
-      </p>
-      
       {keywords.length === 0 ? (
         <div className="text-center py-6 text-gray-500">
           <p className="mb-3">No keywords added yet</p>
@@ -83,10 +79,9 @@ export const KeywordsEntry: React.FC<KeywordsEntryProps> = ({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {keywords.map((keyword, index) => (
-            <div key={index} className="flex gap-3">
+            <div key={index} className="flex gap-1 items-center">
               <div className="flex-1">
                 <InputField
-                  label={`Keyword ${index + 1}`}
                   value={keyword}
                   onChange={(value) => updateKeyword(index, value)}
                   placeholder={getPlaceholder(skillName)}
@@ -95,7 +90,7 @@ export const KeywordsEntry: React.FC<KeywordsEntryProps> = ({
               <button
                 type="button"
                 onClick={() => removeKeyword(index)}
-                className="mt-8 p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
+                className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
                 aria-label="Remove keyword"
               >
                 <Trash2 className="w-4 h-4" />

@@ -16,7 +16,8 @@ import {
   Star,
   BookOpen,
   UserCheck,
-  Menu
+  Menu,
+  BadgeCheck
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -116,7 +117,7 @@ const getSectionIcon = (sectionId: string) => {
     case 'languages':
       return <Globe className={iconClass} />;
     case 'certificates':
-      return <Badge className={iconClass} />;
+      return <BadgeCheck className={iconClass} />;
     case 'interests':
       return <Star className={iconClass} />;
     case 'publications':
