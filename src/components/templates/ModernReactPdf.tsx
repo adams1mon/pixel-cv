@@ -1,11 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Document, Page, View, Text, StyleSheet, Link } from '@react-pdf/renderer';
+import { Document, Page, View, Text, StyleSheet, Link, Image } from '@react-pdf/renderer';
 import { JsonResume } from '../../types/jsonresume';
 
 interface ModernReactPdfProps {
   data: JsonResume;
+  pageWrap: boolean;
 }
 
 // TODO: use canvas for graphics
@@ -23,39 +24,62 @@ const styles = StyleSheet.create({
   },
   
   // Header styles
-  header: {
-    textAlign: 'center',
-    marginBottom: 18,
-    // paddingBottom: 16,
-    // borderBottomWidth: 2,
-    // borderBottomColor: '#3b82f6'
+   header: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  headerLeft: {
+    textAlign: 'left',
+    flex: 1,
+  },
+  headerRight: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  profileImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    objectFit: 'cover',
   },
   name: {
     fontSize: 28,
     fontWeight: 700,
-    marginBottom: 20,
+    marginBottom: 16,
     color: '#1f2937'
   },
   label: {
     fontSize: 16,
     color: '#6b7280',
-    marginBottom: 8
+    marginBottom: 14
   },
   contactRow: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'center',
     marginTop: 2
+  },
+  firstContactText: {
+    fontSize: 10,
+    color: '#6b7280',
+    marginRight: 8,
   },
   contactText: {
     fontSize: 10,
     color: '#6b7280',
-    marginHorizontal: 8
+    marginRight: 8,
+  },
+  firstContactLink: {
+    fontSize: 10,
+    color: '#3b82f6',
+    textDecoration: 'none',
+    marginRight: 8,
   },
   contactLink: {
     fontSize: 10,
     color: '#3b82f6',
-    marginHorizontal: 8,
+    marginRight: 8,
     textDecoration: 'none'
   },
 
@@ -144,6 +168,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     borderRadius: 9999,
     marginRight: 4,
+    lineHeight: 1.3,
     marginBottom: 3
   },
 
@@ -192,6 +217,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     paddingHorizontal: 8,
     borderRadius: 9999,
+    lineHeight: 1.3,
     marginRight: 6,
     marginBottom: 6
   },
@@ -334,7 +360,7 @@ const styles = StyleSheet.create({
   }
 });
 
-export const ModernReactPdf: React.FC<ModernReactPdfProps> = ({ data }) => {
+export const ModernReactPdf: React.FC<ModernReactPdfProps> = ({ data, pageWrap }) => {
   console.log("JsonResume PDF generation started");
   
   // Extract all sections
@@ -351,44 +377,56 @@ export const ModernReactPdf: React.FC<ModernReactPdfProps> = ({ data }) => {
   const publications = data.publications || [];
   const references = data.references || [];
 
+  // TODO: add option for page wrap
+
   return (
     <Document style={styles.document}>
-      <Page size="A4" style={styles.page}>
+      <Page size="A4" style={styles.page} wrap={pageWrap}>
+
         {/* Header Section */}
         <View style={styles.header}>
-          <Text style={styles.name}>{basics.name}</Text>
-          {basics.label && <Text style={styles.label}>{basics.label}</Text>}
+          <View style={styles.headerLeft}>
+            <Text style={styles.name}>{basics.name}</Text>
+            {basics.label && <Text style={styles.label}>{basics.label}</Text>}
 
-          {/* Contact Row 1: location, email, phone */}
-          {(basics.location?.city || basics.email || basics.phone) && (
-            <View style={styles.contactRow}>
-              {basics.location?.city && (
-                <Text style={styles.contactText}>
-                  📍 {basics.location.city}{basics.location.region ? `, ${basics.location.region}` : ''}
-                </Text>
-              )}
-              {basics.email && <Text style={styles.contactText}>✉️ {basics.email}</Text>}
-              {basics.phone && <Text style={styles.contactText}>📞 {basics.phone}</Text>}
-            </View>
-          )}
+            {/* Contact Row 1: location, email, phone */}
+            {(basics.location?.city || basics.email || basics.phone) && (
+              <View style={styles.contactRow}>
+                {basics.location?.city && (
+                  <Text style={styles.contactText}>
+                    📍 {basics.location.city}{basics.location.region ? `, ${basics.location.region}` : ''}
+                  </Text>
+                )}
+                {basics.email && <Text style={styles.contactText}>✉️ {basics.email}</Text>}
+                {basics.phone && <Text style={styles.contactText}>📞 {basics.phone}</Text>}
+              </View>
+            )}
 
-          {/* Contact Row 2: website and profiles */}
-          {(basics.url || (basics.profiles && basics.profiles.length > 0)) && (
-            <View style={styles.contactRow}>
-              {basics.url && (
-                <Link src={basics.url} style={styles.contactLink}>
-                  🌐 {basics.url.replace(/^https?:\/\//, '')}
-                </Link>
-              )}
-              {basics.profiles && basics.profiles.slice(0, 3).map((profile, i) => (
-                <Link key={i} src={profile.url} style={styles.contactLink}>
-                  {profile.network === 'LinkedIn' && '💼'}
-                  {profile.network === 'GitHub' && '💻'}
-                  {profile.network === 'Twitter' && '🐦'}
-                  {!['LinkedIn', 'GitHub', 'Twitter'].includes(profile.network) && '🔗'}
-                  {' '}{profile.network}
-                </Link>
-              ))}
+            {/* Contact Row 2: website and profiles */}
+            {(basics.url || (basics.profiles && basics.profiles.length > 0)) && (
+              <View style={styles.contactRow}>
+                {basics.url && (
+                  <Link src={basics.url} style={styles.contactLink}>
+                    🌐 {basics.url.replace(/^https?:\/\//, '')}
+                  </Link>
+                )}
+                {basics.profiles && basics.profiles.slice(0, 3).map((profile, i) => (
+                  <Link key={i} src={profile.url} style={styles.contactLink}>
+                    {profile.network === 'LinkedIn' && '💼'}
+                    {profile.network === 'GitHub' && '💻'}
+                    {profile.network === 'Twitter' && '🐦'}
+                    {!['LinkedIn', 'GitHub', 'Twitter'].includes(profile.network) && '🔗'}
+                    {' '}{profile.network}
+                  </Link>
+                ))}
+              </View>
+            )}
+          </View>
+
+          {/* Profile Image */}
+          {basics.image && (
+            <View style={styles.headerRight}>
+              <Image src={basics.image} style={styles.profileImage} />
             </View>
           )}
         </View>

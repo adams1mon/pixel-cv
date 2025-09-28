@@ -12,12 +12,11 @@ import {
   Heart,
   Award,
   Globe,
-  Badge,
   Star,
   BookOpen,
   UserCheck,
   Menu,
-  BadgeCheck
+  BadgeCheck,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -78,10 +77,6 @@ export const Sidebar: React.FC = () => {
                   <span className="ml-3 truncate">{section.label}</span>
                 )}
                 
-                {/* Optional indicator - shown when collapsed */}
-                {!sidebarCollapsed && section.optional && (
-                  <span className="ml-auto text-xs text-gray-400">optional</span>
-                )}
             </li>
           ))}
         </ul>
@@ -97,7 +92,6 @@ const getSectionIcon = (sectionId: string) => {
   const iconClass = "w-4 h-4";
   
   switch (sectionId) {
-    // Core JsonResume sections
     case 'basics':
       return <User className={iconClass} />;
     case 'work':
@@ -108,8 +102,6 @@ const getSectionIcon = (sectionId: string) => {
       return <GraduationCap className={iconClass} />;
     case 'skills':
       return <Lightbulb className={iconClass} />;
-    
-    // New JsonResume sections
     case 'volunteer':
       return <Heart className={iconClass} />;
     case 'awards':
@@ -124,16 +116,6 @@ const getSectionIcon = (sectionId: string) => {
       return <BookOpen className={iconClass} />;
     case 'references':
       return <UserCheck className={iconClass} />;
-    
-    // Legacy fallback cases (for backward compatibility)
-    case 'header':
-      return <User className={iconClass} />;
-    case 'summary':
-      return <FileText className={iconClass} />;
-    case 'experience':
-      return <Briefcase className={iconClass} />;
-    
-    // Default fallback
     default:
       return <FileText className={iconClass} />;
   }

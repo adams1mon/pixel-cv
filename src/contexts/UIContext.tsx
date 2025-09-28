@@ -22,7 +22,6 @@ export interface SectionConfig {
   id: JsonResumeSection;
   label: string;
   description: string;
-  optional: boolean;
 }
 
 // UI Context interface
@@ -46,73 +45,61 @@ const SECTIONS: SectionConfig[] = [
     id: 'basics', 
     label: 'Personal Information', 
     description: 'Name, contact info, location, social profiles, and summary',
-    optional: false // Only required section in JsonResume
   },
   { 
     id: 'work', 
     label: 'Work Experience', 
     description: 'Professional work history and achievements',
-    optional: true 
   },
   { 
     id: 'projects', 
     label: 'Projects', 
     description: 'Personal and professional projects',
-    optional: true 
   },
   { 
     id: 'education', 
     label: 'Education', 
     description: 'Academic background and qualifications',
-    optional: true 
   },
   { 
     id: 'skills', 
     label: 'Skills', 
     description: 'Technical and professional skills',
-    optional: true 
   },
   { 
     id: 'volunteer', 
     label: 'Volunteer Work', 
     description: 'Community service and volunteer experiences',
-    optional: true 
   },
   { 
     id: 'awards', 
     label: 'Awards & Achievements', 
     description: 'Recognition and accomplishments',
-    optional: true 
   },
   { 
     id: 'languages', 
     label: 'Languages', 
     description: 'Language proficiencies and fluency levels',
-    optional: true 
   },
   { 
     id: 'certificates', 
     label: 'Certifications', 
     description: 'Professional certifications and licenses',
-    optional: true 
   },
   { 
     id: 'interests', 
     label: 'Interests & Hobbies', 
     description: 'Personal interests and activities',
-    optional: true 
   },
   { 
     id: 'publications', 
     label: 'Publications', 
     description: 'Articles, books, papers, and other publications',
-    optional: true 
   },
   { 
     id: 'references', 
     label: 'References', 
     description: 'Professional references and testimonials',
-    optional: true 
   },
 ];
 

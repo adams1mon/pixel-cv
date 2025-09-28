@@ -3,18 +3,18 @@
 import React from 'react';
 import { useUI } from '../../contexts/UIContext';
 // Existing section editors (to be updated)
-import { BasicsSectionEditor } from './sections/BasicsSectionEditor';
-import { WorkSectionEditor } from './sections/WorkSectionEditor';
-import { EducationSectionEditor } from './sections/EducationSectionEditor';
-import { SkillsSectionEditor } from './sections/SkillsSectionEditor';
-import { ProjectsSectionEditor } from './sections/ProjectsSectionEditor';
-import { LanguagesSectionEditor } from './sections/LanguagesSectionEditor';
-import { PublicationsSectionEditor } from './sections/PublicationsSectionEditor';
-import { AwardsSectionEditor } from './sections/AwardsSectionEditor';
-import { VolunteerSectionEditor } from './sections/VolunteerSectionEditor';
-import { CertificatesSectionEditor } from './sections/CertificatesSectionEditor';
-import { InterestsSectionEditor } from './sections/InterestsSectionEditor';
-import { ReferencesSectionEditor } from './sections/ReferencesSectionEditor';
+import { BasicsSectionEditor } from './sections/basics/BasicsSectionEditor';
+import { WorkSectionEditor } from './sections/work/WorkSectionEditor';
+import { EducationSectionEditor } from './sections/education/EducationSectionEditor';
+import { SkillsSectionEditor } from './sections/skills/SkillsSectionEditor';
+import { ProjectsSectionEditor } from './sections/projects/ProjectsSectionEditor';
+import { LanguagesSectionEditor } from './sections/languages/LanguagesSectionEditor';
+import { PublicationsSectionEditor } from './sections/publications/PublicationsSectionEditor';
+import { AwardsSectionEditor } from './sections/awards/AwardsSectionEditor';
+import { VolunteerSectionEditor } from './sections/volunteer/VolunteerSectionEditor';
+import { CertificatesSectionEditor } from './sections/certificates/CertificatesSectionEditor';
+import { InterestsSectionEditor } from './sections/interests/InterestsSectionEditor';
+import { ReferencesSectionEditor } from './sections/references/ReferencesSectionEditor';
 
 // Placeholder component for sections that don't exist yet
 const PlaceholderSectionEditor: React.FC<{ sectionName: string; description: string }> = ({ sectionName, description }) => (

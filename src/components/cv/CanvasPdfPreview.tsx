@@ -5,11 +5,11 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import { ZoomIn, ZoomOut, RotateCcw, Loader2 } from 'lucide-react';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
+import { useCVStore } from '@/stores/cv-store';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 interface CanvasPdfPreviewProps {
-  pdfInstance: any;
   width?: number;
   initialScale?: number;
 }
@@ -18,6 +18,7 @@ interface CanvasPdfPreviewProps {
 // TODO: less jarring loading transition
 // TODO: loading indicator shifts up fsr
 
+// fixes annotation layer positioning
 function setPageStyles() {
   const pages = document.querySelectorAll(".react-pdf__Page");
     pages.forEach(page => {
@@ -40,12 +41,16 @@ function setPageStyles() {
 }
 
 export const CanvasPdfPreview: React.FC<CanvasPdfPreviewProps> = ({
-  pdfInstance,
   width = 460,
   initialScale = 1.0,
 }) => {
   // PDF instance now passed from parent
-  const instance = pdfInstance;
+  // const instance = pdfInstance;
+
+  const pdfBlob = useCVStore(s => s.pdfBlob);
+  const pdfGenerating = useCVStore(s => s.pdfGenerating);
+  const pdfError = useCVStore(s => s.pdfError);
+
   const [numPages, setNumPages] = React.useState(0);
   const [scale, setScale] = React.useState(initialScale);
   const [scaleInput, setScaleInput] = React.useState(Math.round(initialScale * 100).toString());
@@ -80,22 +85,22 @@ export const CanvasPdfPreview: React.FC<CanvasPdfPreviewProps> = ({
     applyScale(num);
   };
 
-  if (instance.loading) {
+  if (pdfGenerating) {
     return <PdfLoading />;
   }
 
-  if (instance.error) {
-    console.log(instance.error);
+  if (pdfError) {
+    console.log(pdfError);
     return <PdfError />;
   }
 
   return (
     <div className="relative w-full h-full overflow-auto bg-none group">
       { 
-        instance.loading ?
+        pdfGenerating ?
         <PdfLoading />
         :
-        instance.error ?
+        pdfError ?
         <PdfError />
         :
         <>
@@ -144,7 +149,7 @@ export const CanvasPdfPreview: React.FC<CanvasPdfPreviewProps> = ({
             // changing key every time the doc loads to prevent some error
             // https://github.com/wojtekmaj/react-pdf/issues/974
             className="h-full px-2 overflow-auto pb-12"
-            file={instance.blob}
+            file={pdfBlob}
             onLoadSuccess={onLoadSuccess}
             loading={<PdfLoading />}
             error={<PdfError />}

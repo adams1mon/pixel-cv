@@ -3,7 +3,7 @@
 
 // TODO: add metadata?
 export interface JsonResume {
-  metadata: JsonResumeMetadataExtension;
+  metadata?: JsonResumeMetadataExtension;
   $schema?: string;
   basics: JsonResumeBasics;
   work?: JsonResumeWork[];

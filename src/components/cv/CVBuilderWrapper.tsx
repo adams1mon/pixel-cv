@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { CVProvider } from '../../contexts/CVContext';
 import { UIProvider } from '../../contexts/UIContext';
 
 import dynamic from 'next/dynamic';
@@ -17,10 +16,8 @@ const CVBuilder = dynamic(
 // Main export component wrapped with CVProvider and UIProvider
 export const CVBuilderWrapper: React.FC = () => {
   return (
-    <CVProvider>
-      <UIProvider>
-        <CVBuilder />
-      </UIProvider>
-    </CVProvider>
+    <UIProvider>
+      <CVBuilder />
+    </UIProvider>
   );
 };

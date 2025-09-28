@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useCV } from '../../../contexts/CVContext';
-import { JsonResumeProfile } from '../../../types/jsonresume';
-import { Plus, Trash2, ChevronDown, ChevronRight, Globe, Mail, Phone, MapPin, User, Briefcase } from 'lucide-react';
-import { InputField, EmailField, PhoneField, UrlField, TextArea } from './shared/InputField';
+import { JsonResumeProfile } from '../../../../types/jsonresume';
+import { Plus, Trash2, ChevronDown, ChevronRight, Globe, Mail, Phone, MapPin, User, Briefcase, Upload, X } from 'lucide-react';
+import { InputField, EmailField, PhoneField, UrlField, TextArea } from '../shared/InputField';
+import { useCVStore } from '@/stores/cv-store';
+import { EditorHeader } from '../shared/EditorHeader';
 
 const COMMON_SOCIAL_NETWORKS = [
   'LinkedIn',
@@ -22,13 +23,14 @@ const COMMON_SOCIAL_NETWORKS = [
 ];
 
 export const BasicsSectionEditor: React.FC = () => {
-  const { cvData, updateBasics } = useCV();
+
+  const basics = useCVStore(s => s.data.basics);
+  const updateBasics = useCVStore(s => s.updateBasics);
+
   const [expandedSections, setExpandedSections] = useState({
     location: false,
     profiles: true
   });
-
-  const basics = cvData.basics;
 
   // Toggle expandable sections
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -54,6 +56,35 @@ export const BasicsSectionEditor: React.FC = () => {
         [field]: value
       }
     });
+  };
+
+  // Image upload handler
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size must be less than 5MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        handleBasicsUpdate({ image: dataUrl });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    handleBasicsUpdate({ image: undefined });
   };
 
   // Profile management
@@ -84,13 +115,11 @@ export const BasicsSectionEditor: React.FC = () => {
 
   return (
     <div className="section-editor max-w-4xl">
-      {/* Header */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Personal Information</h2>
-        <p className="text-gray-600">
-          Your core personal details, contact information, and professional summary.
-        </p>
-      </div>
+
+      <EditorHeader
+        title="Personal Information"
+        subtitle="Your core personal details, contact information, and professional summary."
+      />
 
       <div className="space-y-8">
         {/* Personal Identity Section */}
@@ -100,7 +129,7 @@ export const BasicsSectionEditor: React.FC = () => {
             <h3 className="text-lg font-semibold text-gray-900">Identity</h3>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-3">
             <InputField
               label="Full Name"
               value={basics.name || ''}
@@ -114,8 +143,63 @@ export const BasicsSectionEditor: React.FC = () => {
               value={basics.label || ''}
               onChange={(value) => handleBasicsUpdate({ label: value })}
               placeholder="e.g., Senior Software Engineer"
-              helpText="Your current role or desired position"
             />
+
+            <div className=''>
+              <label className="block text-sm font-medium text-gray-700">
+                Profile Photo
+              </label>
+              
+              {basics.image ? (
+                <div className="flex items-center space-x-4">
+                    <img
+                      src={basics.image}
+                      alt="Profile"
+                      className="w-20 h-20 object-cover"
+                    />
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-600">Profile photo uploaded</p>
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById('image-upload')?.click()}
+                      className="text-sm text-blue-600 hover:text-blue-700"
+                    >
+                      Change photo
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
+                    aria-label="Remove image"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                  <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                  <p className="text-sm text-gray-600 mb-2">Upload a profile photo</p>
+                  <p className="text-xs text-gray-500 mb-4">JPG, PNG, or GIF (max 5MB)</p>
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('image-upload')?.click()}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Choose File
+                  </button>
+                </div>
+              )}
+
+              <input
+                id="image-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </div>
           </div>
         </div>
 
@@ -126,13 +210,12 @@ export const BasicsSectionEditor: React.FC = () => {
             <h3 className="text-lg font-semibold text-gray-900">Contact Information</h3>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-3">
             <EmailField
               label="Email"
               value={basics.email || ''}
               onChange={(value) => handleBasicsUpdate({ email: value })}
               placeholder="your.email@example.com"
-              icon={<Mail className="inline w-4 h-4 mr-1" />}
             />
             
             <PhoneField
@@ -140,7 +223,6 @@ export const BasicsSectionEditor: React.FC = () => {
               value={basics.phone || ''}
               onChange={(value) => handleBasicsUpdate({ phone: value })}
               placeholder="+1 (555) 123-4567"
-              icon={<Phone className="inline w-4 h-4 mr-1" />}
             />
           </div>
           
@@ -150,7 +232,6 @@ export const BasicsSectionEditor: React.FC = () => {
               value={basics.url || ''}
               onChange={(value) => handleBasicsUpdate({ url: value })}
               placeholder="https://yourwebsite.com"
-              icon={<Globe className="inline w-4 h-4 mr-1" />}
             />
           </div>
         </div>
@@ -181,7 +262,7 @@ export const BasicsSectionEditor: React.FC = () => {
             </button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-3">
             <InputField
               label="City"
               value={basics.location?.city || ''}
