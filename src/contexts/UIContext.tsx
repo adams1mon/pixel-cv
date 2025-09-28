@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 // Section types following JsonResume standard - ALL 12 sections included
-export type JsonResumeSection = 
+export type SidebarSection = 
   | 'basics' 
   | 'work' 
   | 'projects' 
@@ -15,11 +15,12 @@ export type JsonResumeSection =
   | 'certificates' 
   | 'interests' 
   | 'publications' 
-  | 'references';
+  | 'references'
+  | 'template';
 
 // Section configuration for navigation
 export interface SectionConfig {
-  id: JsonResumeSection;
+  id: SidebarSection;
   label: string;
   description: string;
 }
@@ -27,8 +28,8 @@ export interface SectionConfig {
 // UI Context interface
 interface UIContextType {
   // Section navigation
-  activeSection: JsonResumeSection;
-  setActiveSection: (section: JsonResumeSection) => void;
+  activeSection: SidebarSection;
+  setActiveSection: (section: SidebarSection) => void;
   
   // Sidebar state
   sidebarCollapsed: boolean;
@@ -41,6 +42,11 @@ interface UIContextType {
 
 // Section configuration following JsonResume standard - ALL 12 sections
 const SECTIONS: SectionConfig[] = [
+  { 
+    id: 'template', 
+    label: 'Template Settings', 
+    description: 'Choose and customize your CV template',
+  },
   { 
     id: 'basics', 
     label: 'Personal Information', 
@@ -113,7 +119,7 @@ interface UIProviderProps {
 
 export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
   // Section navigation state - default to basics (the required JsonResume section)
-  const [activeSection, setActiveSection] = useState<JsonResumeSection>('basics');
+  const [activeSection, setActiveSection] = useState<SidebarSection>('basics');
   
   // Sidebar state - default to expanded for desktop
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);

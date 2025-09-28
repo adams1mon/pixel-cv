@@ -17,6 +17,7 @@ import {
   UserCheck,
   Menu,
   BadgeCheck,
+  Layout,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -40,7 +41,7 @@ export const Sidebar: React.FC = () => {
       <div className="border-b border-gray-200">
         <button
           onClick={toggleSidebar}
-          className="w-full p-3 flex items-center justify-center hover:bg-gray-100 rounded-md transition-colors hover:cursor-pointer"
+          className="w-full h-10 p-3 flex items-center justify-center hover:bg-gray-100 rounded-md transition-colors hover:cursor-pointer"
           aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {/* Hamburger/Menu icon */}
@@ -54,30 +55,36 @@ export const Sidebar: React.FC = () => {
       {/* Navigation sections */}
       <nav className="flex-1 p-2">
         <ul className="space-y-1">
+          
           {sections.map((section) => (
-            <li key={section.id}
-                className={`
-                  w-full flex items-center text-sm font-medium px-2 py-2 rounded-md transition-colors
-                  hover:cursor-pointer
-                  ${activeSection === section.id 
-                    ? 'bg-blue-100 text-blue-700 border-l-3 border-blue-500' 
-                    : 'text-gray-700 hover:bg-gray-100'
-                  }
-                `}
-                onClick={() => setActiveSection(section.id)}
-                title={sidebarCollapsed ? section.label : section.description}
-            >
-                {/* Section icon */}
-                <div className="flex-shrink-0">
-                  {getSectionIcon(section.id)}
-                </div>
-                
-                {/* Section label - hidden when collapsed */}
-                {!sidebarCollapsed && (
-                  <span className="ml-3 truncate">{section.label}</span>
-                )}
-                
-            </li>
+            <>
+              <li key={section.id}
+                  className={`
+                    w-full flex items-center text-sm font-medium px-2 py-2 rounded-md transition-colors
+                    hover:cursor-pointer
+                    ${activeSection === section.id 
+                      ? 'bg-blue-100 text-blue-700 border-l-3 border-blue-500' 
+                      : 'text-gray-700 hover:bg-gray-100'
+                    }
+                  `}
+                  onClick={() => setActiveSection(section.id)}
+                  title={sidebarCollapsed ? section.label : section.description}
+              >
+                  {/* Section icon */}
+                  <div className="flex-shrink-0">
+                    {getSectionIcon(section.id)}
+                  </div>
+                  
+                  {/* Section label - hidden when collapsed */}
+                  {!sidebarCollapsed && (
+                    <span className="ml-3 truncate">{section.label}</span>
+                  )}
+              </li>
+
+              {section.id === "template" &&
+                <hr className="text-gray-300 pt-2 m-0"></hr>
+              }
+            </>
           ))}
         </ul>
       </nav>
@@ -92,6 +99,9 @@ const getSectionIcon = (sectionId: string) => {
   const iconClass = "w-4 h-4";
   
   switch (sectionId) {
+    case 'template':
+      return <Layout className={iconClass} />; 
+
     case 'basics':
       return <User className={iconClass} />;
     case 'work':
@@ -116,6 +126,7 @@ const getSectionIcon = (sectionId: string) => {
       return <BookOpen className={iconClass} />;
     case 'references':
       return <UserCheck className={iconClass} />;
+
     default:
       return <FileText className={iconClass} />;
   }

@@ -20,6 +20,7 @@ import {
 } from '../types/jsonresume';
 import { ModernReactPdf } from '@/components/templates/ModernReactPdf';
 import { pdf } from '@react-pdf/renderer';
+import { TEMPLATE_REGISTRY } from '@/components/templates/template-registry';
 
 const CV_STORAGE_KEY = 'pixel-cv-jsonresume-data';
 
@@ -55,6 +56,9 @@ type CVState = {
 
   pageWrap: boolean;
   setPageWrap: (d: boolean) => void;
+
+  selectedTemplate: string;
+  setSelectedTemplate: (templateId: string) => void;
 };
 
 export const useCVStore = create<CVState>()(
@@ -135,7 +139,7 @@ export const useCVStore = create<CVState>()(
       }
 
       generateTimeout = setTimeout(async () => {
-        const { data, pageWrap } = get();
+        const { data, pageWrap, selectedTemplate } = get();
         if (!data) return;
 
         try {
@@ -143,7 +147,11 @@ export const useCVStore = create<CVState>()(
           
           set(() => ({ pdfGenerating: true, pdfError: null }));
 
-          const cv = <ModernReactPdf data={data} pageWrap={pageWrap} />
+          const template = TEMPLATE_REGISTRY[selectedTemplate];
+
+          // const cv = <ModernReactPdf data={data} pageWrap={pageWrap} />
+          const cv = <template.component data={data} pageWrap={pageWrap} />
+
           const blob = await pdf(cv).toBlob();
 
           set(() => ({ pdfBlob: blob }));
@@ -159,6 +167,10 @@ export const useCVStore = create<CVState>()(
 
     pageWrap: true,
     setPageWrap: d => set(() => ({ pageWrap: d })),
+
+    // from the template registry
+    selectedTemplate: "modern",
+    setSelectedTemplate: d => set(() => ({ selectedTemplate: d }))
   }))
 );
 
@@ -204,6 +216,13 @@ export const initializeCVStore = () => {
 
   useCVStore.subscribe(
     (state) => state.pageWrap,
+    () => {
+      useCVStore.getState().generatePdfBlob();
+    }
+  );
+
+  useCVStore.subscribe(
+    (state) => state.selectedTemplate,
     () => {
       useCVStore.getState().generatePdfBlob();
     }
