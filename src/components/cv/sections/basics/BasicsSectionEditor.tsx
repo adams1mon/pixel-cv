@@ -63,8 +63,8 @@ export const BasicsSectionEditor: React.FC = () => {
     const file = event.target.files?.[0];
     if (file) {
       // Validate file type
-      if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
+      if (file.type !== "image/jpeg" && file.type !== "image/png") {
+        alert('Please select a jpg or png file');
         return;
       }
       
@@ -180,7 +180,7 @@ export const BasicsSectionEditor: React.FC = () => {
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
                   <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
                   <p className="text-sm text-gray-600 mb-2">Upload a profile photo</p>
-                  <p className="text-xs text-gray-500 mb-4">JPG, PNG, or GIF (max 5MB)</p>
+                  <p className="text-xs text-gray-500 mb-4">JPG or PNG (max 5MB)</p>
                   <button
                     type="button"
                     onClick={() => document.getElementById('image-upload')?.click()}
@@ -195,7 +195,7 @@ export const BasicsSectionEditor: React.FC = () => {
               <input
                 id="image-upload"
                 type="file"
-                accept="image/*"
+                accept="image/png,image/jpeg"
                 onChange={handleImageUpload}
                 className="hidden"
               />

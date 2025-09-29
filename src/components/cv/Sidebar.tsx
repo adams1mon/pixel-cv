@@ -53,12 +53,15 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* Navigation sections */}
-      <nav className="flex-1 p-2">
+      <nav className="flex-1 p-2 pt-1">
         <ul className="space-y-1">
           
-          {sections.map((section) => (
-            <>
-              <li key={section.id}
+          {sections.map((section, index) => (
+              <li key={index}
+                onClick={() => setActiveSection(section.id)}
+                title={sidebarCollapsed ? section.label : section.description}
+              >
+                <div
                   className={`
                     w-full flex items-center text-sm font-medium px-2 py-2 rounded-md transition-colors
                     hover:cursor-pointer
@@ -67,9 +70,8 @@ export const Sidebar: React.FC = () => {
                       : 'text-gray-700 hover:bg-gray-100'
                     }
                   `}
-                  onClick={() => setActiveSection(section.id)}
-                  title={sidebarCollapsed ? section.label : section.description}
-              >
+                >
+
                   {/* Section icon */}
                   <div className="flex-shrink-0">
                     {getSectionIcon(section.id)}
@@ -79,12 +81,12 @@ export const Sidebar: React.FC = () => {
                   {!sidebarCollapsed && (
                     <span className="ml-3 truncate">{section.label}</span>
                   )}
-              </li>
+                </div>
 
-              {section.id === "template" &&
-                <hr className="text-gray-300 pt-2 m-0"></hr>
-              }
-            </>
+                {section.id === "template" &&
+                  <hr key="template-hr" className="text-gray-300 my-1"></hr>
+                }
+              </li>
           ))}
         </ul>
       </nav>

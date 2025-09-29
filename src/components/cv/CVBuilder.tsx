@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 import { setupFonts } from './load-fonts';
 import { clsx } from 'clsx';
 import { initializeCVStore, useCVStore } from '@/stores/cv-store';
+import { TEMPLATE_REGISTRY } from '../templates/template-registry';
 
 const CanvasPdfPreview = dynamic(
   () => import("./CanvasPdfPreview").then(m => m.CanvasPdfPreview),
@@ -47,7 +48,6 @@ export const CVBuilder: React.FC = () => {
         {/* Right Side - React-PDF Preview */}
         <div className="h-full flex-1 p-2 shadow-sm overflow-hidden bg-gray-500">
           <CanvasPdfPreview
-            // width={300}
             initialScale={1}
           />
         </div>
@@ -61,6 +61,7 @@ const headerHeight = 30;
 function Header() {
 
   const importFromJson = useCVStore(s => s.importFromJson);
+  const template = useCVStore(s => s.selectedTemplate);
 
   return (
     <header className={`bg-white shadow-sm border-b h-${headerHeight}`}>
@@ -71,7 +72,7 @@ function Header() {
           </div>
           
           <div className="flex items-center gap-4 text-sm text-gray-500">
-            <span>Template: React-PDF (Modern)</span>
+            <span>template: {TEMPLATE_REGISTRY[template].name}</span>
             <span>•</span>
             <TemplateSettings />
 
