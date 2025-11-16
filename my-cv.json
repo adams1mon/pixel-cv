@@ -1,0 +1,246 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "basics": {
+    "name": "Ádám Simon",
+    "label": "Software Engineer",
+    "image": "",
+    "email": "adamsimon85100@gmail.com",
+    "phone": "+40749533998",
+    "url": "https://adams1mon.pages.dev",
+    "summary": "I'm a curious software engineer, more of a generalist, full-stack dev. Currently helping with AI SKUs at Azure. I enjoy learning about operating systems, AI, embedded systems and distributed systems. In my free time I like to read and to do sports.",
+    "location": {
+      "address": "",
+      "postalCode": "",
+      "city": "Cluj-Napoca",
+      "countryCode": "RO",
+      "region": ""
+    },
+    "profiles": [
+      {
+        "network": "GitHub",
+        "username": "adams1mon",
+        "url": "https://github.com/adams1mon"
+      },
+      {
+        "network": "LinkedIn",
+        "username": "adam-simon-811368215",
+        "url": "https://www.linkedin.com/in/adam-simon-811368215/"
+      }
+    ]
+  },
+  "work": [
+    {
+      "name": "Microsoft",
+      "position": "Software Engineer",
+      "website": "",
+      "startDate": "2025-05",
+      "endDate": null,
+      "summary": "New hardware support at the Datacenter Manager (DCM) Azure Core team.",
+      "highlights": [
+        "Contributed to faster buildout times by enabling other teams to run the DCM software stack locally",
+        "Helped develop support for new storage SKUs"
+      ],
+      "keywords": [
+        ".NET",
+        "C#",
+        "Azure",
+        "microservices"
+      ]
+    },
+    {
+      "name": "Robert Bosch",
+      "position": "Software Engineer",
+      "website": "",
+      "startDate": "2022-06",
+      "endDate": "2025-05",
+      "summary": "Developed various distributed backend systems for IoT applications.",
+      "highlights": [
+        "Architected and implemented backend services, transferring embedded functionality to the cloud",
+        "Implemented device online history, keeping track of device connection/disconnection times for tens of thousands of devices. Optimized read query times.",
+        "Developed a new API for a device management service for a vehicle connectivity platform.",
+        "Created and implemented a metrics, logging and tracing concept to aid with debugging and monitoring"
+      ],
+      "keywords": [
+        "Python",
+        "Java",
+        "Spring Boot",
+        "Kafka",
+        "PostgreSQL",
+        "Kubernetes",
+        "Azure AKS",
+        "Grafana",
+        "Loki",
+        "Tempo",
+        "Prometheus"
+      ]
+    },
+    {
+      "name": "NTT Data Romania",
+      "position": "Frontend & Mobile Dev Intern",
+      "website": "",
+      "startDate": "2022-06",
+      "endDate": "2023-05",
+      "summary": "Worked on a single page application connecting tenants and landlords, digitalizing the renting process and paperwork.",
+      "highlights": [],
+      "keywords": [
+        "TypeScript",
+        "Angular",
+        "Ionic"
+      ]
+    }
+  ],
+  "volunteer": [],
+  "education": [
+    {
+      "institution": "Babes-Bolyai University of Cluj-Napoca",
+      "area": "Enterprise Application Design And Development",
+      "studyType": "Master of Science",
+      "startDate": "2022-10",
+      "endDate": "2024-07",
+      "score": "",
+      "courses": []
+    },
+    {
+      "institution": "Babes-Bolyai University of Cluj-Napoca",
+      "area": "Computer Science",
+      "studyType": "Bachelor of Science",
+      "startDate": "2019-10",
+      "endDate": "2022-07",
+      "score": "",
+      "courses": []
+    }
+  ],
+  "awards": [],
+  "certificates": [],
+  "publications": [],
+  "skills": [
+    {
+      "name": "Backend development",
+      "level": ""
+    },
+    {
+      "name": "Java",
+      "level": ""
+    },
+    {
+      "name": "Python",
+      "level": ""
+    },
+    {
+      "name": "TypeScript",
+      "level": ""
+    },
+    {
+      "name": "JavaScript",
+      "level": ""
+    },
+    {
+      "name": "Spring Boot",
+      "level": ""
+    },
+    {
+      "name": "FastAPI",
+      "level": ""
+    },
+    {
+      "name": "Kafka",
+      "level": ""
+    },
+    {
+      "name": "RabbitMQ",
+      "level": ""
+    },
+    {
+      "name": "MongoDB",
+      "level": ""
+    },
+    {
+      "name": "PostgreSQL",
+      "level": ""
+    },
+    {
+      "name": "React",
+      "level": ""
+    },
+    {
+      "name": "Kubernetes",
+      "level": ""
+    },
+    {
+      "name": "Docker",
+      "level": ""
+    }
+  ],
+  "languages": [],
+  "interests": [],
+  "references": [],
+  "projects": [
+    {
+      "name": "Enlune",
+      "description": "A web-based AI-enabled note editor.",
+      "highlights": [
+        "Integrated AI chat to brainstorm ideas with",
+        "Implemented AI tools so the agent can modify the notes."
+      ],
+      "keywords": [
+        "TypeScript",
+        "React",
+        "TipTap",
+        "MongoDB",
+        "OpenAI"
+      ],
+      "startDate": "",
+      "endDate": "",
+      "url": "https://enlune.com",
+      "type": "application"
+    },
+    {
+      "name": "Beacon: intelligent news aggregation platform",
+      "description": "A web platform which scrapes preconfigured news sites, classifies the articles and extracts topic information from them, then makes the articles searchable using the extracted labels and the text content.",
+      "highlights": [
+        "Automatically updated news",
+        "Textual and semantic search",
+        "Categorization of articles and topic modeling"
+      ],
+      "keywords": [
+        "TypeScript",
+        "React",
+        "Python",
+        "FastAPI",
+        "Redis",
+        "Elasticsearch",
+        "sentence-transformers",
+        "scikit-learn",
+        "Kubernetes",
+        "Azure AKS"
+      ],
+      "startDate": "",
+      "endDate": "",
+      "url": "https://github.com/orgs/beacon-news/repositories",
+      "type": "application"
+    },
+    {
+      "name": "Xtracto: document digitalization web app",
+      "description": "A web app which can generate an editable Microsoft Word file from the image of a document. It uses document region recognition in conjunction with optical character recognition for text extraction.",
+      "highlights": [
+        "Text, title and image region recognition",
+        "Optical character recognition",
+        "Document generation"
+      ],
+      "keywords": [
+        "TypeScript",
+        "React",
+        "Python",
+        "FastAPI",
+        "Tesseract",
+        "Detectron2",
+        "Heroku"
+      ],
+      "startDate": "",
+      "endDate": "",
+      "url": "https://gitlab.com/users/adams1mon/projects",
+      "type": "application"
+    }
+  ]
+}
+

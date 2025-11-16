@@ -1,0 +1,33 @@
+/* Print styles for CV preview */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  
+  body * {
+    visibility: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cv-print-container {
+    visibility: visible;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    page-break-inside: avoid;
+  }
+
+  .cv-print-container * {
+    visibility: visible;
+  }
+
+  /* Hide the print button and other UI elements */
+  .no-print,
+  .no-print * {
+    display: none !important;
+  }
+}
+

@@ -363,9 +363,5 @@ export const jsonResumeSample = {
       "name": "Samantha Lee",
       "reference": "Samantha [Jones] is an outstanding employee who consistently exceeds expectations. She is detail-oriented, organized, and highly skilled in her field. I highly recommend her for any position she may apply for."
     },
-    {
-      "name": "Tom Wilson",
-      "reference": "Samantha is an exceptional leader who inspires his team to work towards a common goal. She is a creative problem solver and an excellent communicator. I highly recommend him for any leadership position he may seek."
-    }
   ]
 };

@@ -7,6 +7,8 @@ import { InputField, EmailField, PhoneField, UrlField, TextArea } from '../share
 import { useCVStore } from '@/stores/cv-store';
 import { EditorHeader } from '../shared/EditorHeader';
 
+// TODO: crop image
+
 const COMMON_SOCIAL_NETWORKS = [
   'LinkedIn',
   'GitHub',

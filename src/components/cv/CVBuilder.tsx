@@ -62,6 +62,38 @@ function Header() {
 
   const importFromJson = useCVStore(s => s.importFromJson);
   const template = useCVStore(s => s.selectedTemplate);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const fileContent = e.target?.result as string;
+        // Validate that it's valid JSON
+        JSON.parse(fileContent);
+        importFromJson(fileContent);
+      } catch (error) {
+        alert('Invalid JSON file. Please upload a valid JSON Resume file.');
+        console.error('Error parsing JSON file:', error);
+      }
+    };
+    reader.onerror = () => {
+      alert('Error reading file. Please try again.');
+    };
+    reader.readAsText(file);
+    
+    // Reset the input so the same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <header className={`bg-white shadow-sm border-b h-${headerHeight}`}>
@@ -81,6 +113,20 @@ function Header() {
               className="px-3 py-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-1"
             >
               Load Sample
+            </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json,application/json"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <button
+              onClick={handleButtonClick}
+              className="px-3 py-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-1"
+            >
+              Import JSON
             </button>
             <GeneratePdfButton />
           </div>

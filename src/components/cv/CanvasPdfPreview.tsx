@@ -44,8 +44,6 @@ export const CanvasPdfPreview: React.FC<CanvasPdfPreviewProps> = ({
   width = 460,
   initialScale = 1.0,
 }) => {
-  // PDF instance now passed from parent
-  // const instance = pdfInstance;
 
   const pdfBlob = useCVStore(s => s.pdfBlob);
   const pdfGenerating = useCVStore(s => s.pdfGenerating);
@@ -53,37 +51,10 @@ export const CanvasPdfPreview: React.FC<CanvasPdfPreviewProps> = ({
 
   const [numPages, setNumPages] = React.useState(0);
   const [scale, setScale] = React.useState(initialScale);
-  const [scaleInput, setScaleInput] = React.useState(Math.round(initialScale * 100).toString());
-
-  // PDF updates are now handled by parent component
 
   const onLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
   }
-
-  const applyScale = (next: number) => {
-    const clamped = Math.min(200, Math.max(50, Math.round(next)));
-    setScale(clamped / 100);
-    setScaleInput(String(clamped));
-  };
-
-  const zoomIn = () => applyScale(scale * 100 + 10);
-  const zoomOut = () => applyScale(scale * 100 - 10);
-  const zoomReset = () => applyScale(initialScale * 100);
-
-  const onScaleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.replace(/[^0-9]/g, '');
-    setScaleInput(val);
-  };
-
-  const onScaleInputBlur = () => {
-    const num = parseInt(scaleInput || '0', 10);
-    if (isNaN(num)) {
-      setScaleInput(String(Math.round(scale * 100)));
-      return;
-    }
-    applyScale(num);
-  };
 
   if (pdfGenerating) {
     return <PdfLoading />;
@@ -104,46 +75,10 @@ export const CanvasPdfPreview: React.FC<CanvasPdfPreviewProps> = ({
         <PdfError />
         :
         <>
-          {/* Overlay controls - appear on hover */}
-          <div className="absolute bottom-6 pointer-events-auto w-full z-10">
-            <div className="w-48 flex items-center justify-center gap-1 mx-auto border-2 rounded-md bg-white/70 backdrop-blur-sm shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
-              <button
-                onClick={zoomOut}
-                title="Zoom out"
-                className="hover:cursor-pointer text-gray-700 hover:bg-gray-100 border-r border-r-gray-400 px-2 py-1 transition-colors"
-              >
-                <ZoomOut className="w-4 h-4" />
-              </button>
-              <div className="flex items-center px-1 py-1">
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  min={50}
-                  max={200}
-                  step={1}
-                  value={scaleInput}
-                  onChange={onScaleInputChange}
-                  onBlur={onScaleInputBlur}
-                  className="text-center text-sm text-gray-800 bg-none outline-none appearance-none"
-                  style={{ WebkitAppearance: 'none' as any, MozAppearance: 'textfield' as any }}
-                />
-            </div>
-            <button
-              onClick={zoomIn}
-              title="Zoom in"
-              className="hover:cursor-pointer text-gray-700 hover:bg-gray-100 border-l border-l-gray-400 px-2 py-1 transition-colors"
-            >
-              <ZoomIn className="w-4 h-4" />
-            </button>
-            <button
-              onClick={zoomReset}
-              title="Reset zoom"
-              className="hover:cursor-pointer text-gray-700 hover:bg-gray-100 border-l border-l-gray-400 px-2 py-1 transition-colors rounded-r-md"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
-            </div>
-          </div>
+          <OverlayControls 
+            scale={scale}
+            setScale={setScale}
+          />
 
           <Document
             // changing key every time the doc loads to prevent some error
@@ -170,6 +105,82 @@ export const CanvasPdfPreview: React.FC<CanvasPdfPreviewProps> = ({
     </div>
   );
 };
+
+function OverlayControls({
+  scale,
+  setScale,
+}: {
+  scale: number,
+  setScale: (v: number) => void,
+}) {
+
+  const [scaleInput, setScaleInput] = React.useState(Math.round(scale * 100).toString());
+
+  const applyScale = (next: number) => {
+    const clamped = Math.min(200, Math.max(50, Math.round(next)));
+    setScale(clamped / 100);
+    setScaleInput(String(clamped));
+  };
+
+  const zoomIn = () => applyScale(scale * 100 + 25);
+  const zoomOut = () => applyScale(scale * 100 - 25);
+  const zoomReset = () => applyScale(scale * 100);
+
+  const onScaleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setScaleInput(e.target.value);
+  };
+
+  const onScaleInputBlur = () => {
+    const num = parseInt(scaleInput || '0', 10);
+    if (isNaN(num)) {
+      setScaleInput(String(Math.round(scale * 100)));
+      return;
+    }
+    applyScale(num);
+  };
+
+  return (
+    <div className="absolute bottom-6 pointer-events-auto w-full z-10">
+      <div className="w-48 flex items-center justify-center gap-1 mx-auto border-2 rounded-md bg-white/70 backdrop-blur-sm shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          onClick={zoomOut}
+          title="Zoom out"
+          className="hover:cursor-pointer text-gray-700 hover:bg-gray-100 border-r border-r-gray-400 px-2 py-1 transition-colors"
+        >
+          <ZoomOut className="w-4 h-4" />
+        </button>
+        <div className="flex items-center px-1 py-1">
+          <input
+            type="number"
+            inputMode="numeric"
+            min={50}
+            max={200}
+            step={1}
+            value={scaleInput}
+            onChange={onScaleInputChange}
+            onBlur={onScaleInputBlur}
+            className="text-center text-sm text-gray-800 bg-none outline-none appearance-none"
+            style={{ WebkitAppearance: 'none' as any, MozAppearance: 'textfield' as any }}
+          />
+      </div>
+      <button
+        onClick={zoomIn}
+        title="Zoom in"
+        className="hover:cursor-pointer text-gray-700 hover:bg-gray-100 border-l border-l-gray-400 px-2 py-1 transition-colors"
+      >
+        <ZoomIn className="w-4 h-4" />
+      </button>
+      <button
+        onClick={zoomReset}
+        title="Reset zoom"
+        className="hover:cursor-pointer text-gray-700 hover:bg-gray-100 border-l border-l-gray-400 px-2 py-1 transition-colors rounded-r-md"
+      >
+        <RotateCcw className="w-4 h-4" />
+      </button>
+      </div>
+    </div>
+  );
+}
 
 function PdfLoading() {
   return (
