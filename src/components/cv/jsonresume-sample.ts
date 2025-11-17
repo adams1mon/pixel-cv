@@ -9,7 +9,7 @@ export const jsonResumeSample = {
   "basics": {
     "name": "Samantha Jones",
     "label": "Software Developer",
-    "image": "profile.jpeg",
+    "image": "profile_pic.png",
     "email": "samantha.jones@email.com",
     "phone": "(555) 555-5555",
     "url": "https://www.samanthajones.com",

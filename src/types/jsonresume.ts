@@ -1,6 +1,8 @@
 // JSON Resume TypeScript Interfaces
 // Based on: https://jsonresume.org/schema/
 
+import { jsonResumeSample } from "@/components/cv/jsonresume-sample";
+
 // TODO: add metadata?
 export interface JsonResume {
   metadata?: JsonResumeMetadataExtension;
@@ -167,6 +169,9 @@ export interface JsonResumeReference {
 // Utility types for form handling and validation
 export type JsonResumeDateString = string; // YYYY-MM-DD format
 export type JsonResumePartialDateString = string; // YYYY-MM or YYYY format
+
+// TODO: add functions to enrich jsonresume with 
+// section show/hide options
 
 // Factory functions for creating empty/default objects
 export const createEmptyJsonResume = (): JsonResume => ({

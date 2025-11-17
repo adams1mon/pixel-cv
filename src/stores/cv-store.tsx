@@ -21,6 +21,8 @@ import {
 import { ModernReactPdf } from '@/components/templates/ModernReactPdf';
 import { pdf } from '@react-pdf/renderer';
 import { TEMPLATE_REGISTRY } from '@/components/templates/template-registry';
+import { jsonResumeSample } from '@/components/cv/jsonresume-sample';
+import { json } from 'stream/consumers';
 
 const CV_STORAGE_KEY = 'pixel-cv-jsonresume-data';
 
@@ -63,7 +65,10 @@ type CVState = {
 
 export const useCVStore = create<CVState>()(
   subscribeWithSelector((set, get) => ({
-    data: createEmptyJsonResume(),
+    // data: createEmptyJsonResume(),
+    // TODO: we're shipping an entire image as string in here, maybe try to
+    // reduce the size of this a bit - or use image from network
+    data: jsonResumeSample,
     isLoaded: false,
 
     setAll: (data) => set({ data }),
@@ -191,6 +196,14 @@ export const initializeCVStore = () => {
   
   // Load from localStorage on initialization
   useCVStore.getState().loadFromLocalStorage();
+  const data = useCVStore.getState().data;
+  console.log(data);
+  
+  // load sample if there's no saved data
+  if (!useCVStore.getState().data) { 
+    useCVStore.getState().importFromJson(JSON.stringify(jsonResumeSample));
+  }
+
   useCVStore.getState().generatePdfBlob();
   
   // Subscribe to data changes for debounced saving

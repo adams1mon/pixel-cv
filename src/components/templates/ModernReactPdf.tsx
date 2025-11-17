@@ -33,17 +33,10 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     flex: 1,
   },
-  headerRight: {
-    // display: 'flex',
-    // alignItems: 'center',
-    // position: 'relative'
-    // border: "1.5pt solid #8d96a1",
-    borderRadius: 10,
-  },
   profileImage: {
     width: 75,
     height: 75,
-    borderRadius: 8,
+    borderRadius: 80,
     objectFit: 'cover',
   },
   name: {
@@ -456,9 +449,7 @@ export const ModernReactPdf: React.FC<ModernReactPdfProps> = ({ data, pageWrap }
           </View>
 
           {/* Profile Image */}
-          <View style={styles.headerRight}>
-            {basics.image && <Image src={basics.image} style={styles.profileImage} />}
-          </View>
+          {basics.image && <Image src={basics.image} style={styles.profileImage} />}
         </View>
 
         {/* Summary */}

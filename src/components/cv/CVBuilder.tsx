@@ -51,6 +51,7 @@ export const CVBuilder: React.FC = () => {
             initialScale={1}
           />
         </div>
+
       </main>
     </div>
   );
