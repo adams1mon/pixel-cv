@@ -28,9 +28,6 @@ export const CVBuilder: React.FC = () => {
 
   console.count("cv builder render");
 
-  // TODO: loading indicator
-  // TODO: solve dommatrix missing 
-
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
@@ -112,7 +109,7 @@ function Header() {
       <div className="max-w-full px-6 py-4">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-lg font-bold text-gray-900">CV Builder</h1>
+            <h1 className="text-md font-bold font-mono text-slate-700">pixel-cv</h1>
           </div>
           
           <div className="flex items-center gap-4 text-sm text-gray-500">

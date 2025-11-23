@@ -13,9 +13,6 @@ export default function PreviewPage() {
     <div style={{ 
       minHeight: '100vh',
     }}>
-      <div className='bg-red-500 w-full h-52'>
-
-      </div>
       <div 
       className='cv-print-container'
       style={{

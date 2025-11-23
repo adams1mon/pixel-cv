@@ -3,7 +3,6 @@ import { EditorHeader } from "../cv/sections/shared/EditorHeader";
 import { TEMPLATE_REGISTRY } from "./template-registry";
 import { TemplateCard } from "./TemplateCard";
 
-// src/components/cv/sections/template/TemplateSettingsEditor.tsx
 export const TemplateSettingsEditor: React.FC = () => {
   const selectedTemplate = useCVStore(s => s.selectedTemplate);
   const setSelectedTemplate = useCVStore(s => s.setSelectedTemplate);
@@ -26,6 +25,15 @@ export const TemplateSettingsEditor: React.FC = () => {
             />
           ))}
         </div>
+      </div>
+      
+      <div className="w-90 mt-12 flex flex-col m-auto text-center">
+        <p className="text-slate-700 text-md font-bold text-center">
+          More templates and settings coming soon!
+        </p>
+
+        <a className="mt-8 underline text-blue-400 text-md font-normal" href="https://x.com/@slimptr" target="_blank">DM me for any requests.</a>
+        <p className="mt-2 text-black text-md font-normal">My site: <a className="text-blue-400 underline" href="https://slimptr.blog" target="_blank">slimptr.blog</a></p>
       </div>
     </div>
   );

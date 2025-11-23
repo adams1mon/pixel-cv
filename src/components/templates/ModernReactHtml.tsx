@@ -44,9 +44,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     position: 'relative',
   },
   profileImage: {
-    width: '75px',
-    height: '75px',
-    borderRadius: '15px',
+    width: '85px',
+    height: '85px',
+    borderRadius: '50%',
     objectFit: 'cover',
   },
   name: {
@@ -398,7 +398,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     objectFit: 'cover',
 
     width: '120%',
-    height: '100%',
+    height: '297mm', // A4 height, one page basically
     zIndex: 0,
   },
 };
@@ -423,7 +423,9 @@ export const ModernReactHtml: React.FC<ModernReactHtmlProps> = ({ data, pageWrap
   return (
     <div style={styles.document}>
       <div style={styles.page}>
+
         {/* Background Image */}
+        {/* only on the first page.. */}
         <img 
           src="grad3.png" 
           alt="" 
