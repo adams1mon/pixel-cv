@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { EnrichedJsonResumeAward, createEmptyAward } from '../../../../types/jsonresume';
+import { createEmptyAward } from '../../../../types/jsonresume';
 import { Award as AwardIcon } from 'lucide-react';
 import { AwardEntry } from './AwardEntry';
 import { useCVStore } from '@/stores/cv-store';

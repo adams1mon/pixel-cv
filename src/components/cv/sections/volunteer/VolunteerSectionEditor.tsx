@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useCVStore } from '@/stores/cv-store';
-import { EnrichedJsonResumeVolunteer, createEmptyVolunteer } from '../../../../types/jsonresume';
-import { Plus, Heart } from 'lucide-react';
+import { createEmptyVolunteer } from '../../../../types/jsonresume';
+import { Heart } from 'lucide-react';
 import { VolunteerEntry } from './VolunteerEntry';
 import { EditorHeader } from '../shared/EditorHeader';
 import { ListPlaceholder } from '../shared/ListPlaceholder';

@@ -1,8 +1,8 @@
 "use client";
 
 import React from 'react';
-import { EnrichedJsonResumeInterest, createEmptyInterest } from '../../../../types/jsonresume';
-import { Plus, Heart } from 'lucide-react';
+import { createEmptyInterest } from '../../../../types/jsonresume';
+import { Heart } from 'lucide-react';
 import { InterestEntry } from './InterestEntry';
 import { useCVStore } from '@/stores/cv-store';
 import { EditorHeader } from '../shared/EditorHeader';

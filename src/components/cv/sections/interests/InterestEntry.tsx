@@ -6,7 +6,6 @@ import { Volleyball, FileText, Hash } from 'lucide-react';
 import { InputField, TextArea } from '../shared/InputField';
 import { KeywordsEntry } from '../shared/KeywordsEntry';
 import { ExpandableEntry } from '../shared/ExpandableEntry';
-import { VisibilityToggle } from '../../VisibilityToggle';
 
 interface InterestEntryProps {
   interest: EnrichedJsonResumeInterest;

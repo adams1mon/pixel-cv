@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { EnrichedJsonResumeEducation, createEmptyEducation } from '../../../../types/jsonresume';
-import { Plus, Trash2, ChevronDown, ChevronRight, GraduationCap, Calendar, MapPin, BookOpen } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, ChevronRight, GraduationCap, Calendar, BookOpen } from 'lucide-react';
 import { InputField } from '../shared/InputField';
 import { useCVStore } from '@/stores/cv-store';
 import { EditorHeader } from '../shared/EditorHeader';

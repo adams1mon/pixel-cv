@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Document, Page, View, Text, StyleSheet, Link, Image, Svg, Path, Polygon, Rect } from '@react-pdf/renderer';
+import { Document, Page, View, Text, StyleSheet, Link, Image } from '@react-pdf/renderer';
 import { JsonResume } from '../../types/jsonresume';
 import { SocialIcon } from './icons/SocialIcon';
 

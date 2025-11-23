@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useCVStore } from '@/stores/cv-store';
-import { EnrichedJsonResumeReference, createEmptyReference } from '../../../../types/jsonresume';
+import { createEmptyReference } from '../../../../types/jsonresume';
 import { IdCard } from 'lucide-react';
 import { ReferenceEntry } from './ReferenceEntry';
 import { EditorHeader } from '../shared/EditorHeader';

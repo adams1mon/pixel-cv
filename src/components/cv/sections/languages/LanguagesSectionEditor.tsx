@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useCVStore } from '@/stores/cv-store';
-import { EnrichedJsonResumeLanguage, createEmptyLanguage } from '../../../../types/jsonresume';
-import { Plus, Globe } from 'lucide-react';
+import { createEmptyLanguage } from '../../../../types/jsonresume';
+import { Globe } from 'lucide-react';
 import { LanguageEntry } from './LanguageEntry';
 import { EditorHeader } from '../shared/EditorHeader';
 import { ListPlaceholder } from '../shared/ListPlaceholder';

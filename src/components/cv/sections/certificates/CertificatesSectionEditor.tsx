@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { EnrichedJsonResumeCertificate, createEmptyCertificate } from '../../../../types/jsonresume';
-import { Plus, BadgeCheck } from 'lucide-react';
+import { createEmptyCertificate } from '../../../../types/jsonresume';
+import { BadgeCheck } from 'lucide-react';
 import { CertificateEntry } from './CertificateEntry';
 import { useCVStore } from '@/stores/cv-store';
 import { EditorHeader } from '../shared/EditorHeader';

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { EnrichedJsonResumeCertificate } from '@/types/jsonresume';
 import { BadgeCheck, Calendar, FileText, FileBadge } from 'lucide-react';
 import { InputField, UrlField, TextArea } from '../shared/InputField';
@@ -19,7 +19,6 @@ export const CertificateEntry: React.FC<CertificateEntryProps> = ({
   onCertificateChange,
   onRemove
 }) => {
-  const [isExpanded, setIsExpanded] = useState(index === 0); // First entry expanded by default
 
   const updateField = (field: keyof EnrichedJsonResumeCertificate, value: any) => {
     onCertificateChange({

@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useCVStore } from '@/stores/cv-store';
-import { EnrichedJsonResumePublication, createEmptyPublication } from '../../../../types/jsonresume';
-import { Plus, BookOpen } from 'lucide-react';
+import { createEmptyPublication } from '../../../../types/jsonresume';
+import { BookOpen } from 'lucide-react';
 import { PublicationEntry } from './PublicationEntry';
 import { EditorHeader } from '../shared/EditorHeader';
 import { ListPlaceholder } from '../shared/ListPlaceholder';

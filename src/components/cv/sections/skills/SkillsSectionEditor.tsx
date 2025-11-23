@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useCVStore } from '@/stores/cv-store';
-import { EnrichedJsonResumeSkill, createEmptySkill } from '../../../../types/jsonresume';
-import { Plus, Lightbulb } from 'lucide-react';
+import { createEmptySkill } from '../../../../types/jsonresume';
+import { Lightbulb } from 'lucide-react';
 import { SkillEntry } from './SkillEntry';
 import { EditorHeader } from '../shared/EditorHeader';
 import { ListPlaceholder } from '../shared/ListPlaceholder';

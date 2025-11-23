@@ -5,7 +5,6 @@ import { EnrichedJsonResumeAward, JsonResumeAward } from '@/types/jsonresume';
 import { Award as AwardIcon, Calendar, FileText, Trophy } from 'lucide-react';
 import { InputField, UrlField, TextArea } from '../shared/InputField';
 import { ExpandableEntry } from '../shared/ExpandableEntry';
-import { VisibilityToggle } from '../../VisibilityToggle';
 
 interface AwardEntryProps {
   item: EnrichedJsonResumeAward;
@@ -14,6 +13,7 @@ interface AwardEntryProps {
   onRemove: () => void;
 }
 
+// TODO: memo needed?
 export const AwardEntry: React.FC<AwardEntryProps> = memo(({
   item,
   index,
@@ -116,3 +116,5 @@ export const AwardEntry: React.FC<AwardEntryProps> = memo(({
     </ExpandableEntry>
   );
 });
+
+AwardEntry.displayName = "AwardEntry";

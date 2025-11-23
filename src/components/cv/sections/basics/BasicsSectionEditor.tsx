@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { JsonResumeProfile } from '../../../../types/jsonresume';
-import { Plus, Trash2, ChevronDown, ChevronRight, Globe, Mail, Phone, MapPin, User, Briefcase, Upload, X } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, ChevronRight, Globe, Mail, MapPin, User, Briefcase, Upload } from 'lucide-react';
 import { InputField, EmailField, PhoneField, UrlField, TextArea } from '../shared/InputField';
 import { useCVStore } from '@/stores/cv-store';
 import { EditorHeader } from '../shared/EditorHeader';
