@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Globe } from 'lucide-react';
-import { JsonResumeLanguage } from '../../../../types/jsonresume';
+import { EnrichedJsonResumeLanguage } from '../../../../types/jsonresume';
 import { InputField } from '../shared/InputField';
 import { ExpandableEntry } from '../shared/ExpandableEntry';
 
@@ -37,9 +37,9 @@ const FLUENCY_SUGGESTIONS = [
 ];
 
 interface LanguageEntryProps {
-  language: JsonResumeLanguage;
+  language: EnrichedJsonResumeLanguage;
   index: number;
-  onLanguageChange: (language: JsonResumeLanguage) => void;
+  onLanguageChange: (language: EnrichedJsonResumeLanguage) => void;
   onRemove: () => void;
 }
 
@@ -52,7 +52,7 @@ export const LanguageEntry: React.FC<LanguageEntryProps> = ({
   const [showLanguageSuggestions, setShowLanguageSuggestions] = useState(false);
   const [showFluencySuggestions, setShowFluencySuggestions] = useState(false);
 
-  const updateLanguage = (updates: Partial<JsonResumeLanguage>) => {
+  const updateLanguage = (updates: Partial<EnrichedJsonResumeLanguage>) => {
     onLanguageChange({ ...language, ...updates });
   };
 
@@ -69,6 +69,13 @@ export const LanguageEntry: React.FC<LanguageEntryProps> = ({
   const title = `${language.language || 'New Language'}${language.fluency ? ` (${language.fluency})` : ''}`;
   const subtitle = `Language #${index + 1}`;
 
+  const toggleVisibility = useCallback(() => {
+    onLanguageChange({
+      ...language,
+      _visible: !language._visible
+    });
+  }, [language, onLanguageChange]);
+
   return (
     <ExpandableEntry
       icon={<Globe className="w-5 h-5" />}
@@ -78,6 +85,8 @@ export const LanguageEntry: React.FC<LanguageEntryProps> = ({
       onRemove={onRemove}
       removeAriaLabel="Remove language"
       className="overflow-visible"
+      visible={language._visible}
+      onToggleVisible={toggleVisibility}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Language Name */}

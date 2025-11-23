@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useCVStore } from '@/stores/cv-store';
-import { JsonResumeLanguage, createEmptyLanguage } from '../../../../types/jsonresume';
+import { EnrichedJsonResumeLanguage, createEmptyLanguage } from '../../../../types/jsonresume';
 import { Plus, Globe } from 'lucide-react';
 import { LanguageEntry } from './LanguageEntry';
 import { EditorHeader } from '../shared/EditorHeader';
@@ -12,23 +12,19 @@ import { ListItems } from '../shared/ListItems';
 
 export const LanguagesSectionEditor: React.FC = () => {
   const languages = useCVStore(s => s.data.languages || []);
-  const updateLanguages = useCVStore(s => s.updateLanguages);
+  const updateSection = useCVStore(s => s.updateSection);
+  const updateSectionItem = useCVStore(s => s.updateSectionItem);
 
   // Language array management
   const addLanguage = () => {
     const newLanguage = createEmptyLanguage();
     const updatedLanguages = [...languages, newLanguage];
-    updateLanguages(updatedLanguages);
+    updateSection("languages", updatedLanguages);
   };
 
   const removeLanguage = (index: number) => {
     const updatedLanguages = languages.filter((_, i) => i !== index);
-    updateLanguages(updatedLanguages);
-  };
-
-  const updateSingleLanguage = (index: number, language: JsonResumeLanguage) => {
-    const updatedLanguages = languages.map((l, i) => i === index ? language : l);
-    updateLanguages(updatedLanguages);
+    updateSection("languages", updatedLanguages);
   };
 
   return (
@@ -64,7 +60,7 @@ export const LanguagesSectionEditor: React.FC = () => {
                   language={language}
                   
                   index={index}
-                  onLanguageChange={(updatedLanguage) => updateSingleLanguage(index, updatedLanguage)}
+                  onLanguageChange={(updatedLanguage) => updateSectionItem("languages", index, updatedLanguage)}
                   onRemove={() => removeLanguage(index)}
                 />
               ))

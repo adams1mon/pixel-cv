@@ -1,19 +1,21 @@
 'use client';
 
 import React, { useState } from 'react';
-import { JsonResumeEducation, createEmptyEducation } from '../../../../types/jsonresume';
+import { EnrichedJsonResumeEducation, createEmptyEducation } from '../../../../types/jsonresume';
 import { Plus, Trash2, ChevronDown, ChevronRight, GraduationCap, Calendar, MapPin, BookOpen } from 'lucide-react';
 import { InputField } from '../shared/InputField';
 import { useCVStore } from '@/stores/cv-store';
 import { EditorHeader } from '../shared/EditorHeader';
 import { ListPlaceholder } from '../shared/ListPlaceholder';
 import { ListItems } from '../shared/ListItems';
+import { VisibilityToggle } from '../../VisibilityToggle';
 
 
 export const EducationSectionEditor: React.FC = () => {
 
   const education = useCVStore(s => s.data.education || []);
-  const updateEducation = useCVStore(s => s.updateEducation);
+  const updateSection = useCVStore(s => s.updateSection);
+  const updateSectionItem = useCVStore(s => s.updateSectionItem);
 
   const [expandedEducation, setExpandedEducation] = useState<Set<number>>(new Set([0])); // First education expanded by default
 
@@ -32,7 +34,7 @@ export const EducationSectionEditor: React.FC = () => {
   const addEducation = () => {
     const newEducation = createEmptyEducation();
     const updatedEducation = [...education, newEducation];
-    updateEducation(updatedEducation);
+    updateSection("education", updatedEducation);
 
     // Expand the new education entry
     setExpandedEducation(prev => new Set([...prev, updatedEducation.length - 1]));
@@ -40,7 +42,7 @@ export const EducationSectionEditor: React.FC = () => {
 
   const removeEducation = (index: number) => {
     const updatedEducation = education.filter((_, i) => i !== index);
-    updateEducation(updatedEducation);
+    updateSection("education", updatedEducation);
     
     // Update expanded set to account for removed item
     const newExpanded = new Set<number>();
@@ -54,11 +56,10 @@ export const EducationSectionEditor: React.FC = () => {
     setExpandedEducation(newExpanded);
   };
 
-  const updateSingleEducation = (index: number, updates: Partial<JsonResumeEducation>) => {
-    const updatedEducation = education.map((eduItem, i) => 
-      i === index ? { ...eduItem, ...updates } : eduItem
-    );
-    updateEducation(updatedEducation);
+  const updateSingleEducation = (index: number, updates: Partial<EnrichedJsonResumeEducation>) => {
+    const eduItem = education[index];
+    const updatedItem = { ...eduItem, ...updates } as EnrichedJsonResumeEducation;
+    updateSectionItem("education", index, updatedItem);
   };
 
   // Courses management
@@ -127,6 +128,8 @@ export const EducationSectionEditor: React.FC = () => {
     updateSingleEducation(eduIndex, { activities });
   };
 
+  // TODO: update this to use the expandable entry
+
   return (
     <div className="section-editor max-w-4xl">
 
@@ -157,7 +160,7 @@ export const EducationSectionEditor: React.FC = () => {
               education.map((eduItem, index) => (
                 <div key={index} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
                   {/* Education Header */}
-                  <div className="bg-gray-50 px-6 py-4">
+                  <div className="flex flex-col items-between gap-2 bg-gray-50 px-6 py-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <GraduationCap className="w-5 h-5 text-blue-600 mr-3" />
@@ -192,16 +195,24 @@ export const EducationSectionEditor: React.FC = () => {
                           )}
                         </button>
                         
-                    <button
+                        <button
                           type="button"
                           onClick={() => removeEducation(index)}
                           className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
                           aria-label="Remove education"
-                    >
+                        >
                           <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                        </button>
+                      </div>
                     </div>
+
+                    <VisibilityToggle visible={eduItem._visible} onToggle={() => {
+                      updateSingleEducation(index, {
+                        ...eduItem,
+                        _visible: !eduItem._visible,
+                      })
+                    }}/>
+
                   </div>
                   
                   {/* Education Details */}
@@ -342,12 +353,12 @@ export const EducationSectionEditor: React.FC = () => {
                             <Plus className="w-4 h-4 mr-1" />
                             Add Honor
                           </button>
-                </div>
+                        </div>
 
                         {(eduItem.honors || []).length === 0 ? (
                           <div className="text-center py-6 text-gray-500">
                             <p className="mb-3">No honors added yet</p>
-                  <button
+                            <button
                               type="button"
                               onClick={() => addHonor(index)}
                               className="text-blue-600 hover:text-blue-700 text-sm font-medium"

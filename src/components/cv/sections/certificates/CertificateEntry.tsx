@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
-import { JsonResumeCertificate } from '@/types/jsonresume';
+import React, { useCallback, useState } from 'react';
+import { EnrichedJsonResumeCertificate } from '@/types/jsonresume';
 import { BadgeCheck, Calendar, FileText, FileBadge } from 'lucide-react';
 import { InputField, UrlField, TextArea } from '../shared/InputField';
 import { ExpandableEntry } from '../shared/ExpandableEntry';
 
 interface CertificateEntryProps {
-  certificate: JsonResumeCertificate;
+  certificate: EnrichedJsonResumeCertificate;
   index: number;
-  onCertificateChange: (certificate: JsonResumeCertificate) => void;
+  onCertificateChange: (certificate: EnrichedJsonResumeCertificate) => void;
   onRemove: () => void;
 }
 
@@ -21,12 +21,19 @@ export const CertificateEntry: React.FC<CertificateEntryProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(index === 0); // First entry expanded by default
 
-  const updateField = (field: keyof JsonResumeCertificate, value: any) => {
+  const updateField = (field: keyof EnrichedJsonResumeCertificate, value: any) => {
     onCertificateChange({
       ...certificate,
       [field]: value
     });
   };
+
+  const toggleVisibility = useCallback(() => {
+    onCertificateChange({
+      ...certificate,
+      _visible: !certificate._visible
+    });
+  }, [certificate, onCertificateChange]);
 
   return (
     <ExpandableEntry
@@ -39,6 +46,8 @@ export const CertificateEntry: React.FC<CertificateEntryProps> = ({
       defaultExpanded={index === 0}
       onRemove={onRemove}
       removeAriaLabel="Remove certificate"
+      visible={certificate._visible !== false}
+      onToggleVisible={toggleVisibility}
     >
       {/* Basic Information */}
       <div className="space-y-4">

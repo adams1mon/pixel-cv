@@ -2,48 +2,81 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
 import {
-  JsonResume,
-  JsonResumeBasics,
-  JsonResumeWork,
-  JsonResumeEducation,
-  JsonResumeProject,
-  JsonResumeSkill,
-  JsonResumeVolunteer,
-  JsonResumeAward,
-  JsonResumeLanguage,
-  JsonResumeCertificate,
-  JsonResumeInterest,
-  JsonResumePublication,
-  JsonResumeReference,
-  createEmptyJsonResume,
-  createDefaultMetadata,
+  EnrichedJsonResumeBasics,
+  EnrichedJsonResumeWork,
+  EnrichedJsonResumeEducation,
+  EnrichedJsonResumeProject,
+  EnrichedJsonResumeSkill,
+  EnrichedJsonResumeVolunteer,
+  EnrichedJsonResumeAward,
+  EnrichedJsonResumeLanguage,
+  EnrichedJsonResumeCertificate,
+  EnrichedJsonResumeInterest,
+  EnrichedJsonResumePublication,
+  EnrichedJsonResumeReference,
+  EnrichedJsonResume,
+  parseAndEnrichJsonResume,
+  enrichJsonResume,
 } from '../types/jsonresume';
-import { ModernReactPdf } from '@/components/templates/ModernReactPdf';
 import { pdf } from '@react-pdf/renderer';
 import { TEMPLATE_REGISTRY } from '@/components/templates/template-registry';
 import { jsonResumeSample } from '@/components/cv/jsonresume-sample';
-import { json } from 'stream/consumers';
 
 const CV_STORAGE_KEY = 'pixel-cv-jsonresume-data';
 
+type EnrichedJsonResumeKeys = Omit<EnrichedJsonResume, "_metadata">;
+type EnrichedJsonResumeArrayKeys = Omit<EnrichedJsonResumeKeys, "basics">;
+
+type SectionTypeMap = {
+  basics: EnrichedJsonResumeBasics;
+  work: EnrichedJsonResumeWork[];
+  projects: EnrichedJsonResumeProject[];
+  education: EnrichedJsonResumeEducation[];
+  skills: EnrichedJsonResumeSkill[];
+  volunteer: EnrichedJsonResumeVolunteer[];
+  awards: EnrichedJsonResumeAward[];
+  languages: EnrichedJsonResumeLanguage[];
+  certificates: EnrichedJsonResumeCertificate[];
+  interests: EnrichedJsonResumeInterest[];
+  publications: EnrichedJsonResumePublication[];
+  references: EnrichedJsonResumeReference[];
+};
+
+type ArraySectionItemTypeMap = {
+  work: EnrichedJsonResumeWork;
+  projects: EnrichedJsonResumeProject;
+  education: EnrichedJsonResumeEducation;
+  skills: EnrichedJsonResumeSkill;
+  volunteer: EnrichedJsonResumeVolunteer;
+  awards: EnrichedJsonResumeAward;
+  languages: EnrichedJsonResumeLanguage;
+  certificates: EnrichedJsonResumeCertificate;
+  interests: EnrichedJsonResumeInterest;
+  publications: EnrichedJsonResumePublication;
+  references: EnrichedJsonResumeReference;
+};
+
+// we work with the enriched jsonresume
 type CVState = {
-  data: JsonResume;
+  data: EnrichedJsonResume;
   isLoaded: boolean; // Track if data has been loaded from localStorage
   // actions
-  setAll: (data: JsonResume) => void;
-  updateBasics: (d: JsonResumeBasics) => void;
-  updateWork: (d: JsonResumeWork[]) => void;
-  updateEducation: (d: JsonResumeEducation[]) => void;
-  updateProjects: (d: JsonResumeProject[]) => void;
-  updateSkills: (d: JsonResumeSkill[]) => void;
-  updateVolunteer: (d: JsonResumeVolunteer[]) => void;
-  updateAwards: (d: JsonResumeAward[]) => void;
-  updateLanguages: (d: JsonResumeLanguage[]) => void;
-  updateCertificates: (d: JsonResumeCertificate[]) => void;
-  updateInterests: (d: JsonResumeInterest[]) => void;
-  updatePublications: (d: JsonResumePublication[]) => void;
-  updateReferences: (d: JsonResumeReference[]) => void;
+  setJsonResume: (data: EnrichedJsonResume) => void;
 
+  // updateSection: <T extends SectionName>(
+  updateSection: <T extends keyof EnrichedJsonResumeKeys>(
+    section: T,
+    item: SectionTypeMap[T]
+  ) => void;
+  
+  // Universal item update function
+  // updateSectionItem: <T extends ArraySectionItemName>(
+  updateSectionItem: <T extends keyof EnrichedJsonResumeArrayKeys>(
+    section: T,
+    index: number,
+    item: ArraySectionItemTypeMap[T]
+  ) => void;
+  
   exportAsJson: () => string;
   importFromJson: (jsonString: string) => void;
   
@@ -65,26 +98,47 @@ type CVState = {
 
 export const useCVStore = create<CVState>()(
   subscribeWithSelector((set, get) => ({
-    // data: createEmptyJsonResume(),
-    // TODO: we're shipping an entire image as string in here, maybe try to
-    // reduce the size of this a bit - or use image from network
-    data: jsonResumeSample,
+    data: enrichJsonResume(jsonResumeSample),
     isLoaded: false,
 
-    setAll: (data) => set({ data }),
+    setJsonResume: (data) => set({ data }),
 
-    updateBasics: (d) => set(state => ({ data: { ...state.data, basics: d } })),
-    updateWork: (d) => set(state => ({ data: { ...state.data, work: d } })),
-    updateEducation: (d) => set(state => ({ data: { ...state.data, education: d } })),
-    updateProjects: (d) => set(state => ({ data: { ...state.data, projects: d } })),
-    updateSkills: (d) => set(state => ({ data: { ...state.data, skills: d } })),
-    updateVolunteer: (d) => set(state => ({ data: { ...state.data, volunteer: d } })),
-    updateAwards: (d) => set(state => ({ data: { ...state.data, awards: d } })),
-    updateLanguages: (d) => set(state => ({ data: { ...state.data, languages: d } })),
-    updateCertificates: (d) => set(state => ({ data: { ...state.data, certificates: d } })),
-    updateInterests: (d) => set(state => ({ data: { ...state.data, interests: d } })),
-    updatePublications: (d) => set(state => ({ data: { ...state.data, publications: d } })),
-    updateReferences: (d) => set(state => ({ data: { ...state.data, references: d } })),
+    updateSection: <T extends keyof EnrichedJsonResumeKeys>(
+      section: T,
+      item: SectionTypeMap[T]
+    ) => set(state => ({
+      data: {
+        ...state.data,
+        [section]: item
+      }
+    })),
+
+    // Universal item update function - updates a single item at index in any array section
+    updateSectionItem: <T extends keyof EnrichedJsonResumeArrayKeys>(
+      section: T,
+      index: number,
+      item: ArraySectionItemTypeMap[T]
+    ) => {
+      const state = get();
+      const currentArray = state.data[section];
+      
+      if (!currentArray) {
+        console.warn(`Section ${section} does not exist in data`);
+        return;
+      }
+      
+      if (index < 0 || index >= currentArray.length) {
+        console.warn(`Index ${index} is out of bounds for section ${section} (length: ${currentArray.length})`);
+        return;
+      }
+      
+      // Create updated array with item replaced at index
+      const updatedArray = currentArray.map((existingItem, i) => 
+        i === index ? item : existingItem
+      ) as SectionTypeMap[T];
+
+      get().updateSection(section, updatedArray);
+    },
 
     exportAsJson: () => {
       try { return JSON.stringify(get().data, null, 2); } catch { return ''; }
@@ -92,15 +146,8 @@ export const useCVStore = create<CVState>()(
 
     importFromJson: (jsonString) => {
       try { 
-        const parsed = JSON.parse(jsonString) as JsonResume;
-
-        // metadata is only used for the title (name of the file) now...
-        // the version is still important to have
-        if (!parsed.metadata) {
-          parsed.metadata = createDefaultMetadata();
-        }
-
-        get().setAll(JSON.parse(jsonString) as JsonResume); 
+        const resume = parseAndEnrichJsonResume(jsonString);
+        get().setJsonResume(resume); 
       } catch (e) { 
         console.error(e); 
       }
@@ -110,8 +157,8 @@ export const useCVStore = create<CVState>()(
       try {
         const savedData = localStorage.getItem(CV_STORAGE_KEY);
         if (savedData) {
-          const parsedData = JSON.parse(savedData) as JsonResume;
-          set({ data: parsedData, isLoaded: true });
+          const jsonResume = parseAndEnrichJsonResume(savedData);
+          set({ data: jsonResume, isLoaded: true });
           console.log('Resume data loaded from localStorage');
         } else {
           set({ isLoaded: true });
@@ -131,6 +178,8 @@ export const useCVStore = create<CVState>()(
         console.error('Failed to save resume data to localStorage:', error);
       }
     },
+
+    // TODO: add move up/down functionality for items
 
     // TODO: maybe separate this
     pdfBlob: null,

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Lightbulb, Target } from 'lucide-react';
-import { JsonResumeSkill } from '../../../../types/jsonresume';
+import { EnrichedJsonResumeSkill } from '../../../../types/jsonresume';
 import { InputField } from '../shared/InputField';
 import { KeywordsEntry } from '../shared/KeywordsEntry';
 import { ExpandableEntry } from '../shared/ExpandableEntry';
@@ -34,9 +34,9 @@ const PROFICIENCY_SUGGESTIONS = [
 ];
 
 interface SkillEntryProps {
-  skill: JsonResumeSkill;
+  skill: EnrichedJsonResumeSkill;
   index: number;
-  onSkillChange: (skill: JsonResumeSkill) => void;
+  onSkillChange: (skill: EnrichedJsonResumeSkill) => void;
   onRemove: () => void;
 }
 
@@ -49,7 +49,7 @@ export const SkillEntry: React.FC<SkillEntryProps> = ({
   const [showSkillSuggestions, setShowSkillSuggestions] = useState(false);
   const [showLevelSuggestions, setShowLevelSuggestions] = useState(false);
 
-  const updateSkill = (updates: Partial<JsonResumeSkill>) => {
+  const updateSkill = (updates: Partial<EnrichedJsonResumeSkill>) => {
     onSkillChange({ ...skill, ...updates });
   };
 
@@ -72,6 +72,13 @@ export const SkillEntry: React.FC<SkillEntryProps> = ({
     ? `${(skill.keywords || []).length} keyword${(skill.keywords || []).length !== 1 ? 's' : ''}`
     : 'No keywords added yet';
 
+  const toggleVisibility = useCallback(() => {
+    onSkillChange({
+      ...skill,
+      _visible: !skill._visible
+    });
+  }, [skill, onSkillChange]);
+
   return (
     <ExpandableEntry
       icon={<Lightbulb className="w-5 h-5" />}
@@ -80,6 +87,8 @@ export const SkillEntry: React.FC<SkillEntryProps> = ({
       defaultExpanded={index === 0}
       onRemove={onRemove}
       removeAriaLabel="Remove skill"
+      visible={skill._visible}
+      onToggleVisible={toggleVisibility}
     >
       {/* Basic Information */}
       <div className="space-y-6">

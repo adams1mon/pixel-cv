@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useCVStore } from '@/stores/cv-store';
-import { JsonResumeSkill, createEmptySkill } from '../../../../types/jsonresume';
+import { EnrichedJsonResumeSkill, createEmptySkill } from '../../../../types/jsonresume';
 import { Plus, Lightbulb } from 'lucide-react';
 import { SkillEntry } from './SkillEntry';
 import { EditorHeader } from '../shared/EditorHeader';
@@ -11,23 +11,19 @@ import { ListItems } from '../shared/ListItems';
 
 export const SkillsSectionEditor: React.FC = () => {
   const skills = useCVStore(s => s.data.skills || []);
-  const updateSkills = useCVStore(s => s.updateSkills);
+  const updateSection = useCVStore(s => s.updateSection);
+  const updateSectionItem = useCVStore(s => s.updateSectionItem);
 
   // Skill array management
   const addSkill = () => {
     const newSkill = createEmptySkill();
     const updatedSkills = [...skills, newSkill];
-    updateSkills(updatedSkills);
+    updateSection("skills", updatedSkills);
   };
 
   const removeSkill = (index: number) => {
     const updatedSkills = skills.filter((_, i) => i !== index);
-    updateSkills(updatedSkills);
-  };
-
-  const updateSingleSkill = (index: number, skill: JsonResumeSkill) => {
-    const updatedSkills = skills.map((s, i) => i === index ? skill : s);
-    updateSkills(updatedSkills);
+    updateSection("skills", updatedSkills);
   };
 
   return (
@@ -62,7 +58,7 @@ export const SkillsSectionEditor: React.FC = () => {
                   key={index}
                   skill={skill}
                   index={index}
-                  onSkillChange={(updatedSkill) => updateSingleSkill(index, updatedSkill)}
+                  onSkillChange={(updatedSkill) => updateSectionItem("skills", index, updatedSkill)}
                   onRemove={() => removeSkill(index)}
                 />
               ))

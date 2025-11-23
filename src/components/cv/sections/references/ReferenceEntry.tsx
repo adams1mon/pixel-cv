@@ -1,15 +1,15 @@
 'use client';
 
-import React from 'react';
-import { JsonResumeReference } from '@/types/jsonresume';
+import React, { useCallback } from 'react';
+import { EnrichedJsonResumeReference } from '@/types/jsonresume';
 import { IdCard, Mail, FileText, User2 } from 'lucide-react';
 import { InputField, EmailField, PhoneField, TextArea } from '../shared/InputField';
 import { ExpandableEntry } from '../shared/ExpandableEntry';
 
 interface ReferenceEntryProps {
-  referenceItem: JsonResumeReference;
+  referenceItem: EnrichedJsonResumeReference;
   index: number;
-  onReferenceChange: (referenceItem: JsonResumeReference) => void;
+  onReferenceChange: (referenceItem: EnrichedJsonResumeReference) => void;
   onRemove: () => void;
 }
 
@@ -19,7 +19,7 @@ export const ReferenceEntry: React.FC<ReferenceEntryProps> = ({
   onReferenceChange,
   onRemove
 }) => {
-  const updateField = (field: keyof JsonResumeReference, value: any) => {
+  const updateField = (field: keyof EnrichedJsonResumeReference, value: any) => {
     onReferenceChange({
       ...referenceItem,
       [field]: value
@@ -29,6 +29,13 @@ export const ReferenceEntry: React.FC<ReferenceEntryProps> = ({
   const title = referenceItem.name || 'New Reference';
   const subtitle = referenceItem.email || referenceItem.phone || 'Contact not set';
 
+  const toggleVisibility = useCallback(() => {
+    onReferenceChange({
+      ...referenceItem,
+      _visible: !referenceItem._visible
+    });
+  }, [referenceItem, onReferenceChange]);
+
   return (
     <ExpandableEntry
       icon={<IdCard className="w-5 h-5" />}
@@ -37,6 +44,8 @@ export const ReferenceEntry: React.FC<ReferenceEntryProps> = ({
       defaultExpanded={index === 0}
       onRemove={onRemove}
       removeAriaLabel="Remove reference"
+      visible={referenceItem._visible}
+      onToggleVisible={toggleVisibility}
     >
       {/* Basic Information */}
       <div className="space-y-4">

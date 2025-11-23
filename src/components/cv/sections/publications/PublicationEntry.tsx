@@ -1,16 +1,16 @@
 'use client';
 
-import React from 'react';
-import { JsonResumePublication } from '@/types/jsonresume';
+import React, { useCallback } from 'react';
+import { EnrichedJsonResumePublication } from '@/types/jsonresume';
 import { BookOpen, Calendar, FileText, BookCheck } from 'lucide-react';
 import { InputField, UrlField, TextArea } from '../shared/InputField';
 import { KeywordsEntry } from '../shared/KeywordsEntry';
 import { ExpandableEntry } from '../shared/ExpandableEntry';
 
 interface PublicationEntryProps {
-  publication: JsonResumePublication;
+  publication: EnrichedJsonResumePublication;
   index: number;
-  onPublicationChange: (publication: JsonResumePublication) => void;
+  onPublicationChange: (publication: EnrichedJsonResumePublication) => void;
   onRemove: () => void;
 }
 
@@ -20,7 +20,7 @@ export const PublicationEntry: React.FC<PublicationEntryProps> = ({
   onPublicationChange,
   onRemove
 }) => {
-  const updateField = (field: keyof JsonResumePublication, value: any) => {
+  const updateField = (field: keyof EnrichedJsonResumePublication, value: any) => {
     onPublicationChange({
       ...publication,
       [field]: value
@@ -31,6 +31,14 @@ export const PublicationEntry: React.FC<PublicationEntryProps> = ({
   const title = publication.name || 'New Publication';
   const subtitle = `${publication.publisher ? publication.publisher : 'Publisher not set'}${publication.releaseDate ? ` • ${publication.releaseDate}` : ''}${keywordsCount > 0 ? ` • ${keywordsCount} keyword${keywordsCount !== 1 ? 's' : ''}` : ''}`;
 
+  const toggleVisibility = useCallback(() => {
+    onPublicationChange({
+      ...publication,
+      _visible: !publication._visible
+    });
+  }, [publication, onPublicationChange]);
+
+
   return (
     <ExpandableEntry
       icon={<BookCheck className="w-5 h-5" />}
@@ -39,6 +47,8 @@ export const PublicationEntry: React.FC<PublicationEntryProps> = ({
       defaultExpanded={index === 0}
       onRemove={onRemove}
       removeAriaLabel="Remove publication"
+      visible={publication._visible}
+      onToggleVisible={toggleVisibility}
     >
       {/* Basic Information */}
       <div className="space-y-4">

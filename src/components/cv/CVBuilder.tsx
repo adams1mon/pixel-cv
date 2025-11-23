@@ -61,6 +61,7 @@ const headerHeight = 30;
 
 function Header() {
 
+  const enrichedResume = useCVStore(s => s.data);
   const importFromJson = useCVStore(s => s.importFromJson);
   const template = useCVStore(s => s.selectedTemplate);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -73,8 +74,6 @@ function Header() {
     reader.onload = (e) => {
       try {
         const fileContent = e.target?.result as string;
-        // Validate that it's valid JSON
-        JSON.parse(fileContent);
         importFromJson(fileContent);
       } catch (error) {
         alert('Invalid JSON file. Please upload a valid JSON Resume file.');
@@ -92,9 +91,21 @@ function Header() {
     }
   };
 
-  const handleButtonClick = () => {
+  const importJson = () => {
     fileInputRef.current?.click();
   };
+
+  const exportJson = () => {
+    // exports the enriched jsonresume for now
+    const data = JSON.stringify(enrichedResume);
+    const blob = new Blob([data], { type: 'application/json' });
+    const fileURL = URL.createObjectURL(blob);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = fileURL;
+    downloadLink.download = 'jsonresume.json';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+  }
 
   return (
     <header className={`bg-white shadow-sm border-b h-${headerHeight}`}>
@@ -124,10 +135,19 @@ function Header() {
               className="hidden"
             />
             <button
-              onClick={handleButtonClick}
+              onClick={importJson}
               className="px-3 py-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-1"
+              title='Import a plain or enriched jsonresume file'
             >
               Import JSON
+            </button>
+
+            <button
+              onClick={exportJson}
+              className="px-3 py-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-1"
+              title='Export the enriched jsonresume file'
+            >
+              Export JSON
             </button>
             <GeneratePdfButton />
           </div>
@@ -150,7 +170,7 @@ function GeneratePdfButton() {
       const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${cvData.metadata?.title || 'CV'}.pdf`;
+      a.download = `${cvData._metadata?.title || 'CV'}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

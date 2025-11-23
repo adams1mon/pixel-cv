@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { JsonResumeCertificate, createEmptyCertificate } from '../../../../types/jsonresume';
+import { EnrichedJsonResumeCertificate, createEmptyCertificate } from '../../../../types/jsonresume';
 import { Plus, BadgeCheck } from 'lucide-react';
 import { CertificateEntry } from './CertificateEntry';
 import { useCVStore } from '@/stores/cv-store';
@@ -12,25 +12,19 @@ import { ListItems } from '../shared/ListItems';
 export const CertificatesSectionEditor: React.FC = () => {
 
   const certificates = useCVStore(s => s.data.certificates || []);
-  const updateCertificates = useCVStore(s => s.updateCertificates);
+  const updateSection = useCVStore(s => s.updateSection);
+  const updateSectionItem = useCVStore(s => s.updateSectionItem);
 
   // Certificates array management
   const addCertificate = () => {
     const newCertificate = createEmptyCertificate();
     const updatedCertificates = [...certificates, newCertificate];
-    updateCertificates(updatedCertificates);
+    updateSection("certificates", updatedCertificates);
   };
 
   const removeCertificate = (index: number) => {
     const updatedCertificates = certificates.filter((_, i) => i !== index);
-    updateCertificates(updatedCertificates);
-  };
-
-  const updateSingleCertificate = (index: number, updated: JsonResumeCertificate) => {
-    const updatedCertificates = certificates.map((certItem, i) => 
-      i === index ? updated : certItem
-    );
-    updateCertificates(updatedCertificates);
+    updateSection("certificates", updatedCertificates);
   };
 
   return (
@@ -65,7 +59,7 @@ export const CertificatesSectionEditor: React.FC = () => {
                   key={index}
                   index={index}
                   certificate={certificate}
-                  onCertificateChange={(updated) => updateSingleCertificate(index, updated)}
+                  onCertificateChange={(updated) => updateSectionItem("certificates", index, updated)}
                   onRemove={() => removeCertificate(index)}
                 />
               ))

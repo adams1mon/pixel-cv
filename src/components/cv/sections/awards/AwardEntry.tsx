@@ -1,15 +1,16 @@
 'use client';
 
 import React, { useCallback, memo } from 'react';
-import { JsonResumeAward } from '@/types/jsonresume';
+import { EnrichedJsonResumeAward, JsonResumeAward } from '@/types/jsonresume';
 import { Award as AwardIcon, Calendar, FileText, Trophy } from 'lucide-react';
 import { InputField, UrlField, TextArea } from '../shared/InputField';
 import { ExpandableEntry } from '../shared/ExpandableEntry';
+import { VisibilityToggle } from '../../VisibilityToggle';
 
 interface AwardEntryProps {
-  item: JsonResumeAward;
+  item: EnrichedJsonResumeAward;
   index: number;
-  onUpdate: (award: JsonResumeAward) => void;
+  onUpdate: (award: EnrichedJsonResumeAward) => void;
   onRemove: () => void;
 }
 
@@ -27,6 +28,14 @@ export const AwardEntry: React.FC<AwardEntryProps> = memo(({
     });
   }, [item, onUpdate]);
 
+  // Toggle visibility for this award
+  const toggleVisibility = useCallback(() => {
+    onUpdate({
+      ...item,
+      _visible: !item._visible
+    });
+  }, [item, onUpdate]);
+
   const title = item.title || 'New Award';
   const subtitle = item.awarder 
     ? `${item.awarder}${item.date ? ` • ${item.date}` : ''}`
@@ -40,6 +49,8 @@ export const AwardEntry: React.FC<AwardEntryProps> = memo(({
       defaultExpanded={index === 0}
       onRemove={onRemove}
       removeAriaLabel="Remove award"
+      visible={item._visible !== false}
+      onToggleVisible={toggleVisibility}
     >
       {/* Basic Information */}
       <div className="space-y-4">

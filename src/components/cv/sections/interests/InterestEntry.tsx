@@ -1,16 +1,17 @@
 'use client';
 
-import React from 'react';
-import { JsonResumeInterest } from '@/types/jsonresume';
+import React, { useCallback } from 'react';
+import { EnrichedJsonResumeInterest } from '@/types/jsonresume';
 import { Volleyball, FileText, Hash } from 'lucide-react';
 import { InputField, TextArea } from '../shared/InputField';
 import { KeywordsEntry } from '../shared/KeywordsEntry';
 import { ExpandableEntry } from '../shared/ExpandableEntry';
+import { VisibilityToggle } from '../../VisibilityToggle';
 
 interface InterestEntryProps {
-  interest: JsonResumeInterest;
+  interest: EnrichedJsonResumeInterest;
   index: number;
-  onInterestChange: (interest: JsonResumeInterest) => void;
+  onInterestChange: (interest: EnrichedJsonResumeInterest) => void;
   onRemove: () => void;
 }
 
@@ -20,7 +21,7 @@ export const InterestEntry: React.FC<InterestEntryProps> = ({
   onInterestChange,
   onRemove
 }) => {
-  const updateField = (field: keyof JsonResumeInterest, value: any) => {
+  const updateField = (field: keyof EnrichedJsonResumeInterest, value: any) => {
     onInterestChange({
       ...interest,
       [field]: value
@@ -31,6 +32,13 @@ export const InterestEntry: React.FC<InterestEntryProps> = ({
   const title = interest.name || 'New Interest';
   const subtitle = keywordCount > 0 ? `${keywordCount} keyword${keywordCount !== 1 ? 's' : ''}` : 'No keywords added yet';
 
+  const toggleVisibility = useCallback(() => {
+    onInterestChange({
+      ...interest,
+      _visible: !interest._visible
+    });
+  }, [interest, onInterestChange]);
+
   return (
     <ExpandableEntry
       icon={<Volleyball className="w-5 h-5" />}
@@ -39,6 +47,8 @@ export const InterestEntry: React.FC<InterestEntryProps> = ({
       defaultExpanded={index === 0}
       onRemove={onRemove}
       removeAriaLabel="Remove interest"
+      visible={interest._visible}
+      onToggleVisible={toggleVisibility}
     >
       {/* Basic Information */}
       <div className="space-y-4">

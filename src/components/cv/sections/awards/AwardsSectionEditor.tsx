@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { JsonResumeAward, createEmptyAward } from '../../../../types/jsonresume';
+import { EnrichedJsonResumeAward, createEmptyAward } from '../../../../types/jsonresume';
 import { Award as AwardIcon } from 'lucide-react';
 import { AwardEntry } from './AwardEntry';
 import { useCVStore } from '@/stores/cv-store';
@@ -12,7 +12,8 @@ import { ListItems } from '../shared/ListItems';
 export const AwardsSectionEditor: React.FC = () => {
 
   const awards = useCVStore(s => s.data.awards || []);
-  const updateAwards = useCVStore(s => s.updateAwards);
+  const updateSection = useCVStore(s => s.updateSection);
+  const updateSectionItem = useCVStore(s => s.updateSectionItem);
 
   console.count("awards section render");
 
@@ -20,19 +21,12 @@ export const AwardsSectionEditor: React.FC = () => {
   const addAward = () => {
     const newAward = createEmptyAward();
     const updatedAwards = [...awards, newAward];
-    updateAwards(updatedAwards);
+    updateSection("awards", updatedAwards);
   };
 
   const removeAward = (index: number) => {
     const updatedAwards = awards.filter((_, i) => i !== index);
-    updateAwards(updatedAwards);
-  };
-
-  const updateSingleAward = (index: number, updated: JsonResumeAward) => {
-    const updatedAwards = awards.map((awardItem, i) => 
-      i === index ? updated : awardItem
-    );
-    updateAwards(updatedAwards);
+    updateSection("awards", updatedAwards);
   };
 
   return (
@@ -68,7 +62,7 @@ export const AwardsSectionEditor: React.FC = () => {
                   key={index}
                   index={index}
                   item={award}
-                  onUpdate={(updated) => updateSingleAward(index, updated)}
+                  onUpdate={(updated) => updateSectionItem("awards", index, updated)}
                   onRemove={() => removeAward(index)}
                 />
               ))

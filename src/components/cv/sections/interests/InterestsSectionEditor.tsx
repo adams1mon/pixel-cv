@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { JsonResumeInterest, createEmptyInterest } from '../../../../types/jsonresume';
+import { EnrichedJsonResumeInterest, createEmptyInterest } from '../../../../types/jsonresume';
 import { Plus, Heart } from 'lucide-react';
 import { InterestEntry } from './InterestEntry';
 import { useCVStore } from '@/stores/cv-store';
@@ -13,25 +13,19 @@ import { ListItems } from '../shared/ListItems';
 export const InterestsSectionEditor: React.FC = () => {
 
   const interests = useCVStore(s => s.data.interests || []);
-  const updateInterests = useCVStore(s => s.updateInterests);
+  const updateSection = useCVStore(s => s.updateSection);
+  const updateSectionItem = useCVStore(s => s.updateSectionItem);
 
   // Interests array management
   const addInterest = () => {
     const newInterest = createEmptyInterest();
     const updatedInterests = [...interests, newInterest];
-    updateInterests(updatedInterests);
+    updateSection("interests", updatedInterests);
   };
 
   const removeInterest = (index: number) => {
     const updatedInterests = interests.filter((_, i) => i !== index);
-    updateInterests(updatedInterests);
-  };
-
-  const updateSingleInterest = (index: number, updated: JsonResumeInterest) => {
-    const updatedInterests = interests.map((interestItem, i) => 
-      i === index ? updated : interestItem
-    );
-    updateInterests(updatedInterests);
+    updateSection("interests", updatedInterests);
   };
 
   return (
@@ -66,7 +60,7 @@ export const InterestsSectionEditor: React.FC = () => {
                   key={index}
                   index={index}
                   interest={interest}
-                  onInterestChange={(updated) => updateSingleInterest(index, updated)}
+                  onInterestChange={(updated) => updateSectionItem("interests", index, updated)}
                   onRemove={() => removeInterest(index)}
                 />
               ))

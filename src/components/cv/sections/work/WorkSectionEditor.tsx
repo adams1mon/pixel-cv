@@ -2,17 +2,19 @@
 
 import React, { useState } from 'react';
 import { useCVStore } from '@/stores/cv-store';
-import { JsonResumeWork, createEmptyWork } from '../../../../types/jsonresume';
+import { EnrichedJsonResumeWork, createEmptyWork } from '../../../../types/jsonresume';
 import { Plus, Trash2, ChevronDown, ChevronRight, Briefcase, Calendar, Building } from 'lucide-react';
 import { InputField, UrlField, TextArea } from '../shared/InputField';
 import { EditorHeader } from '../shared/EditorHeader';
 import { ListPlaceholder } from '../shared/ListPlaceholder';
 import { ListItems } from '../shared/ListItems';
+import { VisibilityToggle } from '../../VisibilityToggle';
 
 
 export const WorkSectionEditor: React.FC = () => {
   const work = useCVStore(s => s.data.work || []);
-  const updateWork = useCVStore(s => s.updateWork);
+  const updateSection = useCVStore(s => s.updateSection);
+  const updateSectionItem = useCVStore(s => s.updateSectionItem);
   const [expandedWork, setExpandedWork] = useState<Set<number>>(new Set([0])); // First work expanded by default
 
   // Toggle expandable work entries
@@ -30,7 +32,7 @@ export const WorkSectionEditor: React.FC = () => {
   const addWork = () => {
     const newWork = createEmptyWork();
     const updatedWork = [...work, newWork];
-    updateWork(updatedWork);
+    updateSection("work", updatedWork);
     
     // Expand the new work entry
     setExpandedWork(prev => new Set([...prev, updatedWork.length - 1]));
@@ -38,7 +40,7 @@ export const WorkSectionEditor: React.FC = () => {
 
   const removeWork = (index: number) => {
     const updatedWork = work.filter((_, i) => i !== index);
-    updateWork(updatedWork);
+    updateSection("work", updatedWork);
     
     // Update expanded set to account for removed item
     const newExpanded = new Set<number>();
@@ -52,11 +54,10 @@ export const WorkSectionEditor: React.FC = () => {
     setExpandedWork(newExpanded);
   };
 
-  const updateSingleWork = (index: number, updates: Partial<JsonResumeWork>) => {
-    const updatedWork = work.map((workItem, i) => 
-      i === index ? { ...workItem, ...updates } : workItem
-    );
-    updateWork(updatedWork);
+  const updateSingleWork = (index: number, updates: Partial<EnrichedJsonResumeWork>) => {
+    const workItem = work[index];
+    const updatedItem = { ...workItem, ...updates } as EnrichedJsonResumeWork;
+    updateSectionItem("work", index, updatedItem);
   };
 
   // Highlight management
@@ -112,6 +113,8 @@ export const WorkSectionEditor: React.FC = () => {
     });
   };
 
+  // TODO: use ExpandableEntry
+
   return (
     <div className="section-editor max-w-4xl">
 
@@ -142,7 +145,7 @@ export const WorkSectionEditor: React.FC = () => {
               work.map((workItem, index) => (
                 <div key={index} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
                   {/* Work Header */}
-                  <div className="bg-gray-50 px-6 py-4">
+                  <div className="flex flex-col items-between gap-2 bg-gray-50 px-6 py-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <Briefcase className="w-5 h-5 text-blue-600 mr-3" />
@@ -186,6 +189,13 @@ export const WorkSectionEditor: React.FC = () => {
                         </button>
                       </div>
                     </div>
+
+                    <VisibilityToggle visible={workItem._visible} onToggle={() => {
+                      updateSingleWork(index, {
+                        ...workItem,
+                        _visible: !workItem._visible,
+                      })
+                    }}/>
                   </div>
 
                   {/* Work Details */}

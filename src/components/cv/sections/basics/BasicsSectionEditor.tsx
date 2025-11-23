@@ -6,6 +6,7 @@ import { Plus, Trash2, ChevronDown, ChevronRight, Globe, Mail, Phone, MapPin, Us
 import { InputField, EmailField, PhoneField, UrlField, TextArea } from '../shared/InputField';
 import { useCVStore } from '@/stores/cv-store';
 import { EditorHeader } from '../shared/EditorHeader';
+import { VisibilityToggle } from '../../VisibilityToggle';
 
 // TODO: crop image
 
@@ -27,7 +28,7 @@ const COMMON_SOCIAL_NETWORKS = [
 export const BasicsSectionEditor: React.FC = () => {
 
   const basics = useCVStore(s => s.data.basics);
-  const updateBasics = useCVStore(s => s.updateBasics);
+  const updateSection = useCVStore(s => s.updateSection);
 
   const [expandedSections, setExpandedSections] = useState({
     location: false,
@@ -44,7 +45,7 @@ export const BasicsSectionEditor: React.FC = () => {
 
   // Helper to update basics fields
   const handleBasicsUpdate = (updates: Partial<typeof basics>) => {
-    updateBasics({
+    updateSection("basics", {
       ...basics,
       ...updates
     });
@@ -115,6 +116,14 @@ export const BasicsSectionEditor: React.FC = () => {
 
   const profiles = basics.profiles || [];
 
+  // Toggle visibility for basics section
+  const toggleVisibility = () => {
+    updateSection("basics", {
+      ...basics,
+      _visible: !basics._visible
+    });
+  };
+
   return (
     <div className="section-editor max-w-4xl">
 
@@ -122,6 +131,8 @@ export const BasicsSectionEditor: React.FC = () => {
         title="Personal Information"
         subtitle="Your core personal details, contact information, and professional summary."
       />
+
+      <VisibilityToggle visible={basics._visible} onToggle={toggleVisibility} />
 
       <div className="space-y-8">
         {/* Personal Identity Section */}

@@ -2,6 +2,7 @@
 
 import React, { useState, ReactNode } from 'react';
 import { ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
+import { VisibilityToggle } from '../../VisibilityToggle';
 
 interface ExpandableEntryProps {
   // Header content
@@ -16,6 +17,9 @@ interface ExpandableEntryProps {
   // Actions
   onRemove?: () => void;
   removeAriaLabel?: string;
+
+  visible: boolean;
+  onToggleVisible: () => void;
   
   // Content
   children: ReactNode;
@@ -34,6 +38,8 @@ export const ExpandableEntry: React.FC<ExpandableEntryProps> = ({
   onToggle,
   onRemove,
   removeAriaLabel = "Remove item",
+  visible = true,
+  onToggleVisible,
   children,
   className = "",
   headerClassName = "",
@@ -50,7 +56,7 @@ export const ExpandableEntry: React.FC<ExpandableEntryProps> = ({
   return (
     <div className={`bg-white border border-gray-200 rounded-lg overflow-hidden ${className}`}>
       {/* Entry Header */}
-      <div className={`bg-gray-50 px-6 py-4 ${headerClassName}`}>
+      <div className={`flex flex-col gap-2 items-between bg-gray-50 px-6 py-4 ${headerClassName}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center min-w-0">
             <div className="text-blue-600 mr-3">
@@ -99,6 +105,8 @@ export const ExpandableEntry: React.FC<ExpandableEntryProps> = ({
             )}
           </div>
         </div>
+
+        <VisibilityToggle visible={visible} onToggle={onToggleVisible} />
       </div>
 
       {/* Entry Details */}

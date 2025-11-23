@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useCVStore } from '@/stores/cv-store';
-import { JsonResumeReference, createEmptyReference } from '../../../../types/jsonresume';
+import { EnrichedJsonResumeReference, createEmptyReference } from '../../../../types/jsonresume';
 import { IdCard } from 'lucide-react';
 import { ReferenceEntry } from './ReferenceEntry';
 import { EditorHeader } from '../shared/EditorHeader';
@@ -12,25 +12,19 @@ import { ListItems } from '../shared/ListItems';
 
 export const ReferencesSectionEditor: React.FC = () => {
   const references = useCVStore(s => s.data.references || []);
-  const updateReferences = useCVStore(s => s.updateReferences);
+  const updateSection = useCVStore(s => s.updateSection);
+  const updateSectionItem = useCVStore(s => s.updateSectionItem);
 
   // References array management
   const addReference = () => {
     const newReference = createEmptyReference();
     const updatedReferences = [...references, newReference];
-    updateReferences(updatedReferences);
+    updateSection("references", updatedReferences);
   };
 
   const removeReference = (index: number) => {
     const updatedReferences = references.filter((_, i) => i !== index);
-    updateReferences(updatedReferences);
-  };
-
-  const updateSingleReference = (index: number, updated: JsonResumeReference) => {
-    const updatedReferences = references.map((refItem, i) => 
-      i === index ? updated : refItem
-    );
-    updateReferences(updatedReferences);
+    updateSection("references", updatedReferences);
   };
 
   return (
@@ -64,7 +58,7 @@ export const ReferencesSectionEditor: React.FC = () => {
                   key={index}
                   index={index}
                   referenceItem={referenceItem}
-                  onReferenceChange={(updated) => updateSingleReference(index, updated)}
+                  onReferenceChange={(updated) => updateSectionItem("references", index, updated)}
                   onRemove={() => removeReference(index)}
                 />
               ))

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useCVStore } from '@/stores/cv-store';
-import { JsonResumeVolunteer, createEmptyVolunteer } from '../../../../types/jsonresume';
+import { EnrichedJsonResumeVolunteer, createEmptyVolunteer } from '../../../../types/jsonresume';
 import { Plus, Heart } from 'lucide-react';
 import { VolunteerEntry } from './VolunteerEntry';
 import { EditorHeader } from '../shared/EditorHeader';
@@ -14,25 +14,19 @@ import { ListItems } from '../shared/ListItems';
 
 export const VolunteerSectionEditor: React.FC = () => {
   const volunteers = useCVStore(s => s.data.volunteer || []);
-  const updateVolunteer = useCVStore(s => s.updateVolunteer);
+  const updateSection = useCVStore(s => s.updateSection);
+  const updateSectionItem = useCVStore(s => s.updateSectionItem);
 
   // Volunteers array management
   const addVolunteer = () => {
     const newVolunteer = createEmptyVolunteer();
     const updatedVolunteers = [...volunteers, newVolunteer];
-    updateVolunteer(updatedVolunteers);
+    updateSection("volunteer", updatedVolunteers);
   };
 
   const removeVolunteer = (index: number) => {
     const updatedVolunteers = volunteers.filter((_, i) => i !== index);
-    updateVolunteer(updatedVolunteers);
-  };
-
-  const updateSingleVolunteer = (index: number, updated: JsonResumeVolunteer) => {
-    const updatedVolunteers = volunteers.map((volunteerItem, i) => 
-      i === index ? updated : volunteerItem
-    );
-    updateVolunteer(updatedVolunteers);
+    updateSection("volunteer", updatedVolunteers);
   };
 
   return (
@@ -67,7 +61,7 @@ export const VolunteerSectionEditor: React.FC = () => {
                   key={index}
                   index={index}
                   volunteer={volunteer}
-                  onVolunteerChange={(updated) => updateSingleVolunteer(index, updated)}
+                  onVolunteerChange={(updated) => updateSectionItem("volunteer", index, updated)}
                   onRemove={() => removeVolunteer(index)}
                 />
               ))

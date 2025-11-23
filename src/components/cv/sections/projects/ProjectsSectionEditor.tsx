@@ -2,18 +2,20 @@
 
 import React, { useState } from 'react';
 import { useCVStore } from '@/stores/cv-store';
-import { JsonResumeProject, createEmptyProject } from '../../../../types/jsonresume';
+import { EnrichedJsonResumeProject, createEmptyProject } from '../../../../types/jsonresume';
 import { Plus, Trash2, ChevronDown, ChevronRight, FolderOpen, Calendar, Link, Building, Code } from 'lucide-react';
 import { InputField, UrlField, TextArea } from '../shared/InputField';
 import { EditorHeader } from '../shared/EditorHeader';
 import { ListPlaceholder } from '../shared/ListPlaceholder';
 import { ListItems } from '../shared/ListItems';
+import { VisibilityToggle } from '../../VisibilityToggle';
 
 
 
 export const ProjectsSectionEditor: React.FC = () => {
   const projects = useCVStore(s => s.data.projects || []);
-  const updateProjects = useCVStore(s => s.updateProjects);
+  const updateSection = useCVStore(s => s.updateSection);
+  const updateSectionItem = useCVStore(s => s.updateSectionItem);
   const [expandedProjects, setExpandedProjects] = useState<Set<number>>(new Set([0])); // First project expanded by default
 
   // Toggle expandable project entries
@@ -31,7 +33,7 @@ export const ProjectsSectionEditor: React.FC = () => {
   const addProject = () => {
     const newProject = createEmptyProject();
     const updatedProjects = [...projects, newProject];
-    updateProjects(updatedProjects);
+    updateSection("projects", updatedProjects);
 
     // Expand the new project entry
     setExpandedProjects(prev => new Set([...prev, updatedProjects.length - 1]));
@@ -39,7 +41,7 @@ export const ProjectsSectionEditor: React.FC = () => {
 
   const removeProject = (index: number) => {
     const updatedProjects = projects.filter((_, i) => i !== index);
-    updateProjects(updatedProjects);
+    updateSection("projects", updatedProjects);
     
     // Update expanded set to account for removed item
     const newExpanded = new Set<number>();
@@ -53,11 +55,10 @@ export const ProjectsSectionEditor: React.FC = () => {
     setExpandedProjects(newExpanded);
   };
 
-  const updateSingleProject = (index: number, updates: Partial<JsonResumeProject>) => {
-    const updatedProjects = projects.map((project, i) => 
-      i === index ? { ...project, ...updates } : project
-    );
-    updateProjects(updatedProjects);
+  const updateSingleProject = (index: number, updates: Partial<EnrichedJsonResumeProject>) => {
+    const project = projects[index];
+    const updatedItem = { ...project, ...updates } as EnrichedJsonResumeProject;
+    updateSectionItem("projects", index, updatedItem);
   };
 
   // Highlights management
@@ -126,6 +127,8 @@ export const ProjectsSectionEditor: React.FC = () => {
     updateSingleProject(projectIndex, { roles });
   };
 
+  // TODO: use ExpandableEntry
+
   return (
     <div className="section-editor max-w-4xl">
 
@@ -156,7 +159,7 @@ export const ProjectsSectionEditor: React.FC = () => {
               projects.map((project, index) => (
                 <div key={index} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
                   {/* Project Header */}
-                  <div className="bg-gray-50 px-6 py-4">
+                  <div className="flex flex-col items-between gap-2 bg-gray-50 px-6 py-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <FolderOpen className="w-5 h-5 text-blue-600 mr-3" />
@@ -190,22 +193,30 @@ export const ProjectsSectionEditor: React.FC = () => {
                           )}
                         </button>
                         
-                    <button
+                        <button
                           type="button"
                           onClick={() => removeProject(index)}
                           className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
                           aria-label="Remove project"
-                    >
+                        >
                           <Trash2 className="w-4 h-4" />
-                    </button>
+                        </button>
                       </div>
                     </div>
+
+                    <VisibilityToggle visible={project._visible} onToggle={() => {
+                      updateSingleProject(index, {
+                        ...project,
+                        _visible: !project._visible,
+                      })
+                    }}/>
+
                   </div>
 
                   {/* Project Details */}
                   {expandedProjects.has(index) && (
                     <div className="p-6 space-y-8">
-                  {/* Basic Information */}
+                      {/* Basic Information */}
                       <div className="space-y-6">
                         <div className="flex items-center mb-4">
                           <Code className="w-5 h-5 text-blue-600 mr-2" />

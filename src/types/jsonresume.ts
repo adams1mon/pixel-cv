@@ -1,12 +1,8 @@
 // JSON Resume TypeScript Interfaces
 // Based on: https://jsonresume.org/schema/
 
-import { jsonResumeSample } from "@/components/cv/jsonresume-sample";
-
-// TODO: add metadata?
+// we can load the plain type and enrich it
 export interface JsonResume {
-  metadata?: JsonResumeMetadataExtension;
-  $schema?: string;
   basics: JsonResumeBasics;
   work?: JsonResumeWork[];
   projects?: JsonResumeProject[];
@@ -21,11 +17,57 @@ export interface JsonResume {
   references?: JsonResumeReference[];
 }
 
+// we work with this enriched format, save it to localStorage
+export interface EnrichedJsonResume {
+  _metadata?: JsonResumeMetadataExtension;
+  basics: EnrichedJsonResumeBasics;
+  work?: EnrichedJsonResumeWork[];
+  projects?: EnrichedJsonResumeProject[];
+  education?: EnrichedJsonResumeEducation[];
+  publications?: EnrichedJsonResumePublication[];
+  volunteer?: EnrichedJsonResumeVolunteer[];
+  awards?: EnrichedJsonResumeAward[];
+  skills?: EnrichedJsonResumeSkill[];
+  languages?: EnrichedJsonResumeLanguage[];
+  certificates?: EnrichedJsonResumeCertificate[];
+  interests?: EnrichedJsonResumeInterest[];
+  references?: EnrichedJsonResumeReference[];
+}
+
 export interface JsonResumeMetadataExtension {
   title: string;
   // For data format compatibility
   version: string;
 }
+
+export interface VisibleExtension {
+  _visible: boolean;
+}
+
+// Enriched interfaces with visibility extension
+export interface EnrichedJsonResumeBasics extends JsonResumeBasics, VisibleExtension {}
+
+export interface EnrichedJsonResumeWork extends JsonResumeWork, VisibleExtension {}
+
+export interface EnrichedJsonResumeProject extends JsonResumeProject, VisibleExtension {}
+
+export interface EnrichedJsonResumeEducation extends JsonResumeEducation, VisibleExtension {}
+
+export interface EnrichedJsonResumePublication extends JsonResumePublication, VisibleExtension {}
+
+export interface EnrichedJsonResumeVolunteer extends JsonResumeVolunteer, VisibleExtension {}
+
+export interface EnrichedJsonResumeAward extends JsonResumeAward, VisibleExtension {}
+
+export interface EnrichedJsonResumeSkill extends JsonResumeSkill, VisibleExtension {}
+
+export interface EnrichedJsonResumeLanguage extends JsonResumeLanguage, VisibleExtension {}
+
+export interface EnrichedJsonResumeCertificate extends JsonResumeCertificate, VisibleExtension {}
+
+export interface EnrichedJsonResumeInterest extends JsonResumeInterest, VisibleExtension {}
+
+export interface EnrichedJsonResumeReference extends JsonResumeReference, VisibleExtension {}
 
 // Basics Section (required)
 export interface JsonResumeBasics {
@@ -174,8 +216,8 @@ export type JsonResumePartialDateString = string; // YYYY-MM or YYYY format
 // section show/hide options
 
 // Factory functions for creating empty/default objects
-export const createEmptyJsonResume = (): JsonResume => ({
-  metadata: createDefaultMetadata(),
+export const createEmptyJsonResume = (): EnrichedJsonResume => ({
+  _metadata: createDefaultMetadata(),
   basics: createEmptyBasics(),
   work: [],
   projects: [],
@@ -195,7 +237,8 @@ export const createDefaultMetadata = (): JsonResumeMetadataExtension => ({
   version: "1.0.0",
 });
 
-export const createEmptyBasics = (): JsonResumeBasics => ({
+export const createEmptyBasics = (): EnrichedJsonResumeBasics => ({
+  _visible: true,
   name: "",
   label: "",
   email: "",
@@ -209,7 +252,8 @@ export const createEmptyBasics = (): JsonResumeBasics => ({
   profiles: []
 });
 
-export const createEmptyWork = (): JsonResumeWork => ({
+export const createEmptyWork = (): EnrichedJsonResumeWork => ({
+  _visible: true,
   name: "",
   position: "",
   startDate: "",
@@ -218,61 +262,142 @@ export const createEmptyWork = (): JsonResumeWork => ({
   keywords: []
 });
 
-export const createEmptyEducation = (): JsonResumeEducation => ({
+export const createEmptyEducation = (): EnrichedJsonResumeEducation => ({
+  _visible: true,
   institution: "",
   area: "",
   studyType: "",
   startDate: ""
 });
 
-export const createEmptyProject = (): JsonResumeProject => ({
+export const createEmptyProject = (): EnrichedJsonResumeProject => ({
+  _visible: true,
   name: "",
   description: "",
   highlights: [],
   keywords: []
 });
 
-export const createEmptySkill = (): JsonResumeSkill => ({
+export const createEmptySkill = (): EnrichedJsonResumeSkill => ({
+  _visible: true,
   name: "",
   level: ""
 });
 
-export const createEmptyVolunteer = (): JsonResumeVolunteer => ({
+export const createEmptyVolunteer = (): EnrichedJsonResumeVolunteer => ({
+  _visible: true,
   organization: "",
   position: "",
   summary: "",
   highlights: []
 });
 
-export const createEmptyAward = (): JsonResumeAward => ({
+export const createEmptyAward = (): EnrichedJsonResumeAward => ({
+  _visible: true,
   title: "",
   awarder: "",
   summary: ""
 });
 
-export const createEmptyPublication = (): JsonResumePublication => ({
+export const createEmptyPublication = (): EnrichedJsonResumePublication => ({
+  _visible: true,
   name: "",
   publisher: "",
   releaseDate: "",
   summary: ""
 });
 
-export const createEmptyCertificate = (): JsonResumeCertificate => ({
+export const createEmptyCertificate = (): EnrichedJsonResumeCertificate => ({
+  _visible: true,
   name: "",
   issuer: ""
 });
 
-export const createEmptyLanguage = (): JsonResumeLanguage => ({
+export const createEmptyLanguage = (): EnrichedJsonResumeLanguage => ({
+  _visible: true,
   language: "",
   fluency: ""
 });
 
-export const createEmptyInterest = (): JsonResumeInterest => ({
+export const createEmptyInterest = (): EnrichedJsonResumeInterest => ({
+  _visible: true,
   name: "",
   summary: ""
 });
 
-export const createEmptyReference = (): JsonResumeReference => ({
+export const createEmptyReference = (): EnrichedJsonResumeReference => ({
+  _visible: true,
   name: "",
   reference: ""
 });
+
+
+// we either parse plain jsonresume and enrich it, 
+// or parse the enriched format
+export function parseAndEnrichJsonResume(jsonString: string): EnrichedJsonResume {
+  const resume = JSON.parse(jsonString);
+  if (!isEnrichedJsonResume(resume)) {
+    return enrichJsonResume(resume);
+  }
+  return resume;
+}
+
+/**
+ * Type guard to check if a parsed JSON object is an EnrichedJsonResume
+ * Checks for the presence of _visible property on basics, which is always present in enriched resumes
+ */
+export function isEnrichedJsonResume(
+  data: JsonResume | EnrichedJsonResume
+): data is EnrichedJsonResume {
+  // Check if basics has _visible property (most reliable indicator)
+  if (data.basics && '_visible' in data.basics) {
+    return true;
+  }
+  
+  // Also check for _metadata as a secondary indicator (though it's optional)
+  if ('_metadata' in data) {
+    return true;
+  }
+  
+  return false;
+}
+
+export function enrichJsonResume(jsonResume: JsonResume): EnrichedJsonResume {
+  
+  // Enrich basics
+  const enrichedBasics: EnrichedJsonResumeBasics = {
+    ...jsonResume.basics,
+    _visible: true,
+  };
+  
+  // Helper function to enrich array items
+  const enrichArray = <T extends object>(
+    array: T[] | undefined
+  ): (T & VisibleExtension)[] | undefined => {
+    if (!array) return undefined;
+    return array.map(item => ({
+      ...item,
+      _visible: true,
+    }));
+  };
+  
+  return {
+    _metadata: createDefaultMetadata(),
+    basics: enrichedBasics,
+    work: enrichArray<JsonResumeWork>(jsonResume.work) as EnrichedJsonResumeWork[],
+    projects: enrichArray(jsonResume.projects) as EnrichedJsonResumeProject[],
+    education: enrichArray(jsonResume.education) as EnrichedJsonResumeEducation[],
+    publications: enrichArray(jsonResume.publications) as EnrichedJsonResumePublication[],
+    volunteer: enrichArray(jsonResume.volunteer) as EnrichedJsonResumeVolunteer[],
+    awards: enrichArray(jsonResume.awards) as EnrichedJsonResumeAward[],
+    skills: enrichArray(jsonResume.skills) as EnrichedJsonResumeSkill[],
+    languages: enrichArray(jsonResume.languages) as EnrichedJsonResumeLanguage[],
+    certificates: enrichArray(jsonResume.certificates) as EnrichedJsonResumeCertificate[],
+    interests: enrichArray(jsonResume.interests) as EnrichedJsonResumeInterest[],
+    references: enrichArray(jsonResume.references) as EnrichedJsonResumeReference[],
+  };
+}
+
+export function isJsonResumeItemVisible(item: any): boolean {
+  return item !== undefined && item !== null && "_visible" in item && item._visible;
+}

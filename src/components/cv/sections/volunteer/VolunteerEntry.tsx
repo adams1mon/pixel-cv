@@ -1,16 +1,16 @@
 'use client';
 
-import React from 'react';
-import { JsonResumeVolunteer } from '@/types/jsonresume';
+import React, { useCallback } from 'react';
+import { EnrichedJsonResumeVolunteer } from '@/types/jsonresume';
 import { Building2, Calendar, Globe, FileText, Star, Trash2, Heart } from 'lucide-react';
 import { InputField, UrlField, TextArea } from '../shared/InputField';
 import { KeywordsEntry } from '../shared/KeywordsEntry';
 import { ExpandableEntry } from '../shared/ExpandableEntry';
 
 interface VolunteerEntryProps {
-  volunteer: JsonResumeVolunteer;
+  volunteer: EnrichedJsonResumeVolunteer;
   index: number;
-  onVolunteerChange: (volunteer: JsonResumeVolunteer) => void;
+  onVolunteerChange: (volunteer: EnrichedJsonResumeVolunteer) => void;
   onRemove: () => void;
 }
 
@@ -20,7 +20,7 @@ export const VolunteerEntry: React.FC<VolunteerEntryProps> = ({
   onVolunteerChange,
   onRemove
 }) => {
-  const updateField = (field: keyof JsonResumeVolunteer, value: any) => {
+  const updateField = (field: keyof EnrichedJsonResumeVolunteer, value: any) => {
     onVolunteerChange({
       ...volunteer,
       [field]: value
@@ -48,6 +48,13 @@ export const VolunteerEntry: React.FC<VolunteerEntryProps> = ({
   const title = volunteer.organization || 'New Volunteer Experience';
   const subtitle = `${volunteer.position ? volunteer.position : 'Role not set'}${contributionsCount > 0 ? ` • ${contributionsCount} contribution${contributionsCount !== 1 ? 's' : ''}` : ''}`;
 
+  const toggleVisibility = useCallback(() => {
+    onVolunteerChange({
+      ...volunteer,
+      _visible: !volunteer._visible
+    });
+  }, [volunteer, onVolunteerChange]);
+
   return (
     <ExpandableEntry
       icon={<Heart className="w-5 h-5" />}
@@ -56,6 +63,8 @@ export const VolunteerEntry: React.FC<VolunteerEntryProps> = ({
       defaultExpanded={index === 0}
       onRemove={onRemove}
       removeAriaLabel="Remove volunteer experience"
+      visible={volunteer._visible}
+      onToggleVisible={toggleVisibility}
     >
       {/* Basic Information */}
       <div className="space-y-4">

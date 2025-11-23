@@ -145,6 +145,9 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
   );
 };
 
+// TODO: do we need the context if we have the cv-store?
+// just create another store for this UI stuff
+
 // Custom hook for using UI context
 export const useUI = (): UIContextType => {
   const context = useContext(UIContext);
