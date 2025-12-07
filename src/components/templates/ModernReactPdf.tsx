@@ -2,13 +2,15 @@
 
 import React from 'react';
 import { Document, Page, View, Text, StyleSheet, Link, Image } from '@react-pdf/renderer';
-import { JsonResume } from '../../types/jsonresume';
+import { EnrichedJsonResume } from '../../types/jsonresume';
 import { SocialIcon } from './icons/SocialIcon';
 
 interface ModernReactPdfProps {
-  data: JsonResume;
+  data: EnrichedJsonResume;
   pageWrap: boolean;
 }
+
+// TODO: use _visible
 
 const styles = StyleSheet.create({
   document: {
@@ -379,7 +381,7 @@ const styles = StyleSheet.create({
 // template parameters.
 // font size, section styles, background graphic, etc.
 export const ModernReactPdf: React.FC<ModernReactPdfProps> = ({ data, pageWrap }) => {
-  console.log("JsonResume PDF generation started");
+  console.log("ModernReactPdf generation started");
   
   // Extract all sections
   const basics = data.basics;

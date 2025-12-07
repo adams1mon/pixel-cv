@@ -17,6 +17,7 @@ import {
   EnrichedJsonResume,
   parseAndEnrichJsonResume,
   enrichJsonResume,
+  parseAndEnrichJsonResumes,
 } from '../types/jsonresume';
 import { pdf } from '@react-pdf/renderer';
 import { TEMPLATE_REGISTRY } from '@/components/templates/template-registry';
@@ -56,10 +57,17 @@ type ArraySectionItemTypeMap = {
   references: EnrichedJsonResumeReference;
 };
 
+// TODO: add more resumes
+
 // we work with the enriched jsonresume
 type CVState = {
   data: EnrichedJsonResume;
+
+  resumes: Record<string, EnrichedJsonResume>;
+  currentResumeId: string;
+
   isLoaded: boolean; // Track if data has been loaded from localStorage
+
   // actions
   setJsonResume: (data: EnrichedJsonResume) => void;
 
@@ -97,135 +105,192 @@ type CVState = {
 };
 
 export const useCVStore = create<CVState>()(
-  subscribeWithSelector((set, get) => ({
-    data: enrichJsonResume(jsonResumeSample),
-    isLoaded: false,
+  subscribeWithSelector((set, get) => {
 
-    setJsonResume: (data) => set({ data }),
+    const resume = enrichJsonResume(jsonResumeSample);  
 
-    updateSection: <T extends keyof EnrichedJsonResumeKeys>(
-      section: T,
-      item: SectionTypeMap[T]
-    ) => set(state => ({
-      data: {
-        ...state.data,
-        [section]: item
-      }
-    })),
+    return {
 
-    // Universal item update function - updates a single item at index in any array section
-    updateSectionItem: <T extends keyof EnrichedJsonResumeArrayKeys>(
-      section: T,
-      index: number,
-      item: ArraySectionItemTypeMap[T]
-    ) => {
-      const state = get();
-      const currentArray = state.data[section];
-      
-      if (!currentArray) {
-        console.warn(`Section ${section} does not exist in data`);
-        return;
-      }
-      
-      if (index < 0 || index >= currentArray.length) {
-        console.warn(`Index ${index} is out of bounds for section ${section} (length: ${currentArray.length})`);
-        return;
-      }
-      
-      // Create updated array with item replaced at index
-      const updatedArray = currentArray.map((existingItem, i) => 
-        i === index ? item : existingItem
-      ) as SectionTypeMap[T];
+      // TODO: get rid of this 'data' and just use resumes[currentResumeId]
+      data: resume,
 
-      get().updateSection(section, updatedArray);
-    },
+      resumes: { [resume._metadata.id]:  resume },
+      currentResumeId: resume._metadata.id,
 
-    exportAsJson: () => {
-      try { return JSON.stringify(get().data, null, 2); } catch { return ''; }
-    },
+      isLoaded: false,
 
-    importFromJson: (jsonString) => {
-      try { 
-        const resume = parseAndEnrichJsonResume(jsonString);
-        get().setJsonResume(resume); 
-      } catch (e) { 
-        console.error(e); 
-      }
-    },
+      setJsonResume: (data) => set({ data }),
 
-    loadFromLocalStorage: () => {
-      try {
-        const savedData = localStorage.getItem(CV_STORAGE_KEY);
-        if (savedData) {
-          const jsonResume = parseAndEnrichJsonResume(savedData);
-          set({ data: jsonResume, isLoaded: true });
-          console.log('Resume data loaded from localStorage');
-        } else {
+      updateSection: <T extends keyof EnrichedJsonResumeKeys>(
+        section: T,
+        item: SectionTypeMap[T]
+      ) => set(state => {
+        const newData = {
+          ...state.data,
+          [section]: item,
+        }
+        const newResumes = state.resumes;
+        newResumes[state.currentResumeId] = newData;
+        return {
+          // resumes: {
+          //   ...state.resumes,
+          //   [state.currentResumeId]: newData,
+          // },
+          resumes: newResumes,
+          data: newData,
+        }
+      }),
+
+      // Universal item update function - updates a single item at index in any array section
+      updateSectionItem: <T extends keyof EnrichedJsonResumeArrayKeys>(
+        section: T,
+        index: number,
+        item: ArraySectionItemTypeMap[T]
+      ) => {
+        const state = get();
+        const currentArray = state.data[section];
+        
+        if (!currentArray) {
+          console.warn(`Section ${section} does not exist in data`);
+          return;
+        }
+        
+        if (index < 0 || index >= currentArray.length) {
+          console.warn(`Index ${index} is out of bounds for section ${section} (length: ${currentArray.length})`);
+          return;
+        }
+        
+        // Create updated array with item replaced at index
+        const updatedArray = currentArray.map((existingItem, i) => 
+          i === index ? item : existingItem
+        ) as SectionTypeMap[T];
+
+        get().updateSection(section, updatedArray);
+      },
+
+      exportAsJson: () => {
+        try { return JSON.stringify(get().data, null, 2); } catch { return ''; }
+      },
+
+      importFromJson: (jsonString) => {
+        try { 
+          const resume = parseAndEnrichJsonResume(jsonString);
+          get().setJsonResume(resume); 
+        } catch (e) { 
+          console.error(e); 
+        }
+      },
+
+      loadFromLocalStorage: () => {
+        try {
+          const jsonString = localStorage.getItem(CV_STORAGE_KEY);
+          if (jsonString) {
+            const savedData = parseAndEnrichJsonResumes(jsonString);
+            const firstResume = Object.values(savedData.resumes)[0];
+            set({ 
+              resumes: savedData.resumes, 
+              data: firstResume, 
+              currentResumeId: firstResume._metadata.id,
+              isLoaded: true,
+            });
+            console.log('Resumes loaded from localStorage');
+          } else {
+            set({ isLoaded: true });
+          }
+        } catch (error) {
+          console.error('Failed to load resumes from localStorage:', error);
           set({ isLoaded: true });
         }
-      } catch (error) {
-        console.error('Failed to load resume data from localStorage:', error);
-        set({ isLoaded: true });
-      }
-    },
+      },
 
-    saveToLocalStorage: () => {
-      try {
-        const { data } = get();
-        localStorage.setItem(CV_STORAGE_KEY, JSON.stringify(data));
-        console.log('Resume data saved to localStorage');
-      } catch (error) {
-        console.error('Failed to save resume data to localStorage:', error);
-      }
-    },
-
-    // TODO: add move up/down functionality for items
-
-    // TODO: maybe separate this
-    pdfBlob: null,
-    pdfGenerating: false,
-    pdfError: null,
-
-    generatePdfBlob: () => {
-
-      if (generateTimeout) {
-        clearTimeout(generateTimeout);
-      }
-
-      generateTimeout = setTimeout(async () => {
-        const { data, pageWrap, selectedTemplate } = get();
-        if (!data) return;
-
+      saveToLocalStorage: () => {
         try {
-          console.log("generating pdf blob");
-          
-          set(() => ({ pdfGenerating: true, pdfError: null }));
-
-          const template = TEMPLATE_REGISTRY[selectedTemplate];
-
-          // const cv = <ModernReactPdf data={data} pageWrap={pageWrap} />
-          const cv = <template.component data={data} pageWrap={pageWrap} />
-
-          const blob = await pdf(cv).toBlob();
-
-          set(() => ({ pdfBlob: blob }));
-
-        } catch (err) {
-          set(() => ({ pdfError: err }));
-        } finally {
-          set(() => ({ pdfGenerating: false }));
-          console.warn("resetting");
+          const state = get();
+          const savedData = {
+            resumes: state.resumes, 
+            currentResumeId: state.currentResumeId,
+          };
+          localStorage.setItem(CV_STORAGE_KEY, JSON.stringify(savedData));
+          console.log('Resume data saved to localStorage');
+        } catch (error) {
+          console.error('Failed to save resume data to localStorage:', error);
         }
-      }, PDF_GEN_DEBOUNCE_MS);
-    },
+      },
 
-    pageWrap: true,
-    setPageWrap: d => set(() => ({ pageWrap: d })),
+      // loadFromLocalStorage: () => {
+      //   try {
+      //     const savedData = localStorage.getItem(CV_STORAGE_KEY);
+      //     if (savedData) {
+      //       const jsonResume = parseAndEnrichJsonResume(savedData);
+      //       set({ data: jsonResume, isLoaded: true });
+      //       console.log('Resume data loaded from localStorage');
+      //     } else {
+      //       set({ isLoaded: true });
+      //     }
+      //   } catch (error) {
+      //     console.error('Failed to load resume data from localStorage:', error);
+      //     set({ isLoaded: true });
+      //   }
+      // },
 
-    // from the template registry
-    selectedTemplate: "modern",
-    setSelectedTemplate: d => set(() => ({ selectedTemplate: d }))
-  }))
+      // saveToLocalStorage: () => {
+      //   try {
+      //     const { data } = get();
+      //     localStorage.setItem(CV_STORAGE_KEY, JSON.stringify(data));
+      //     console.log('Resume data saved to localStorage');
+      //   } catch (error) {
+      //     console.error('Failed to save resume data to localStorage:', error);
+      //   }
+      // },
+
+      // TODO: add move up/down functionality for resume section items
+
+      // TODO: maybe separate this
+      pdfBlob: null,
+      pdfGenerating: false,
+      pdfError: null,
+
+      generatePdfBlob: () => {
+
+        if (generateTimeout) {
+          clearTimeout(generateTimeout);
+        }
+
+        generateTimeout = setTimeout(async () => {
+          const { data, pageWrap, selectedTemplate } = get();
+          if (!data) return;
+
+          try {
+            console.log("generating pdf blob");
+            
+            set(() => ({ pdfGenerating: true, pdfError: null }));
+
+            const template = TEMPLATE_REGISTRY[selectedTemplate];
+
+            // const cv = <ModernReactPdf data={data} pageWrap={pageWrap} />
+            const cv = <template.component data={data} pageWrap={pageWrap} />
+
+            const blob = await pdf(cv).toBlob();
+
+            set(() => ({ pdfBlob: blob }));
+
+          } catch (err) {
+            set(() => ({ pdfError: err }));
+          } finally {
+            set(() => ({ pdfGenerating: false }));
+            console.warn("resetting");
+          }
+        }, PDF_GEN_DEBOUNCE_MS);
+      },
+
+      pageWrap: true,
+      setPageWrap: d => set(() => ({ pageWrap: d })),
+
+      // from the template registry
+      selectedTemplate: "modern",
+      setSelectedTemplate: d => set(() => ({ selectedTemplate: d }))
+    }
+  })
 );
 
 const LOCAL_STORAGE_DEBOUNCE_MS = 1000;
@@ -291,4 +356,9 @@ export const initializeCVStore = () => {
   );
   
   isSubscribed = true;
+};
+
+export interface SavedJsonResumeData {
+  resumes: Record<string, EnrichedJsonResume>,
+  currentResumeId: string,
 };

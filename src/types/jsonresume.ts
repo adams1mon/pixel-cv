@@ -1,6 +1,9 @@
 // JSON Resume TypeScript Interfaces
 // Based on: https://jsonresume.org/schema/
 
+import { SavedJsonResumeData } from "@/stores/cv-store";
+import { nanoid } from "nanoid";
+
 // we can load the plain type and enrich it
 export interface JsonResume {
   basics: JsonResumeBasics;
@@ -19,7 +22,7 @@ export interface JsonResume {
 
 // we work with this enriched format, save it to localStorage
 export interface EnrichedJsonResume {
-  _metadata?: JsonResumeMetadataExtension;
+  _metadata: JsonResumeMetadataExtension;
   basics: EnrichedJsonResumeBasics;
   work?: EnrichedJsonResumeWork[];
   projects?: EnrichedJsonResumeProject[];
@@ -35,7 +38,11 @@ export interface EnrichedJsonResume {
 }
 
 export interface JsonResumeMetadataExtension {
-  title: string;
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+
   // For data format compatibility
   version: string;
 }
@@ -215,26 +222,13 @@ export type JsonResumePartialDateString = string; // YYYY-MM or YYYY format
 // TODO: add functions to enrich jsonresume with 
 // section show/hide options
 
-// Factory functions for creating empty/default objects
-export const createEmptyJsonResume = (): EnrichedJsonResume => ({
-  _metadata: createDefaultMetadata(),
-  basics: createEmptyBasics(),
-  work: [],
-  projects: [],
-  publications: [],
-  education: [],
-  volunteer: [],
-  awards: [],
-  skills: [],
-  languages: [],
-  certificates: [],
-  interests: [],
-  references: []
-});
-
-export const createDefaultMetadata = (): JsonResumeMetadataExtension => ({
-  title: "CV",
+export const createDefaultMetadata = (id?: string): JsonResumeMetadataExtension => ({
   version: "1.0.0",
+
+  id: id || nanoid(),
+  name: `CV-${Date.now().toString()}`,
+  createdAt: Date.now().toString(),
+  updatedAt: Date.now().toString(),
 });
 
 export const createEmptyBasics = (): EnrichedJsonResumeBasics => ({
@@ -331,6 +325,23 @@ export const createEmptyReference = (): EnrichedJsonResumeReference => ({
   reference: ""
 });
 
+// export function parseAndEnrichJsonResumes(jsonString: string): Record<string, EnrichedJsonResume> {
+export function parseAndEnrichJsonResumes(jsonString: string): SavedJsonResumeData {
+  const savedData: SavedJsonResumeData = JSON.parse(jsonString);
+
+  if (!("resumes" in savedData && "currentResumeId" in savedData)) {
+    throw new Error("malformed jsonresume data, couldn't load resumes");
+  }
+
+  for (const resumeId in savedData.resumes) {
+    const resume = savedData.resumes[resumeId];
+    if (!isEnrichedJsonResume(resume)) {
+      savedData.resumes[resumeId] = enrichJsonResume(resume);
+    }
+  }
+
+  return savedData;
+}
 
 // we either parse plain jsonresume and enrich it, 
 // or parse the enriched format
@@ -371,6 +382,7 @@ export function enrichJsonResume(jsonResume: JsonResume): EnrichedJsonResume {
   };
   
   // Helper function to enrich array items
+  // adds visible: true
   const enrichArray = <T extends object>(
     array: T[] | undefined
   ): (T & VisibleExtension)[] | undefined => {

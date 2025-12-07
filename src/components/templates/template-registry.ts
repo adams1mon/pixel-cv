@@ -1,4 +1,4 @@
-import { JsonResume } from "@/types/jsonresume";
+import { EnrichedJsonResume } from "@/types/jsonresume";
 import { ModernReactPdf } from "./ModernReactPdf";
 import { AlphaPdfTemplate } from "./AlphaPdfTemplate";
 
@@ -7,7 +7,7 @@ export interface TemplateConfig {
   name: string;
   description: string;
   preview: string; // base64 preview image
-  component: React.ComponentType<{ data: JsonResume, pageWrap: boolean }>;
+  component: React.ComponentType<{ data: EnrichedJsonResume, pageWrap: boolean }>;
 }
 
 export const TEMPLATE_REGISTRY: Record<string, TemplateConfig> = {
@@ -15,6 +15,7 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateConfig> = {
     id: 'modern',
     name: 'Modern',
     description: 'Clean, professional single-column layout',
+    // TODO: preview
     preview: '', // We'll add previews later
     component: ModernReactPdf
   },

@@ -167,7 +167,7 @@ function GeneratePdfButton() {
       const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${cvData._metadata?.title || 'CV'}.pdf`;
+      a.download = `${cvData._metadata?.name || 'CV'}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
