@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, memo } from 'react';
+import React, { useCallback } from 'react';
 import { EnrichedJsonResumeAward, JsonResumeAward } from '@/types/jsonresume';
 import { Award as AwardIcon, Calendar, FileText, Trophy } from 'lucide-react';
 import { InputField, UrlField, TextArea } from '../shared/InputField';
@@ -13,8 +13,7 @@ interface AwardEntryProps {
   onRemove: () => void;
 }
 
-// TODO: memo needed?
-export const AwardEntry: React.FC<AwardEntryProps> = memo(({
+export const AwardEntry: React.FC<AwardEntryProps> = ({
   item,
   index,
   onUpdate,
@@ -115,6 +114,4 @@ export const AwardEntry: React.FC<AwardEntryProps> = memo(({
       </div>
     </ExpandableEntry>
   );
-});
-
-AwardEntry.displayName = "AwardEntry";
+};
