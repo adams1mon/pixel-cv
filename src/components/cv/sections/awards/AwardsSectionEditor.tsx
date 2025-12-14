@@ -57,7 +57,6 @@ export const AwardsSectionEditor: React.FC = () => {
             buttonText='Add Another Award'
             listItems={
               awards.map((award, index) => (
-                // <AwardEntry
                 <AwardEntry
                   key={index}
                   index={index}

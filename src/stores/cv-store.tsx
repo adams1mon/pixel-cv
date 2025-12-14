@@ -252,6 +252,9 @@ export const useCVStore = create<CVState>()(
 
       generatePdfBlob: () => {
 
+        // TODO: don't generate if we're in the mobile layout 
+        // in the editor view?
+
         if (generateTimeout) {
           clearTimeout(generateTimeout);
         }

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "pixel-cv",
-  description: "Resume builder application. Build beautiful CVs easily.",
+  description: "A simple, comprehensive, and easy to use resume builder. Build ATS-ready, beautiful CVs easily.",
 };
 
 // TODO: add metadata

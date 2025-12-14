@@ -1,10 +1,3 @@
-
-// could also use canvas for the icons, not emojis
-// canvas -> can use svg -> icons are basically svg anyways, so win
-// can use SVG component directly, use lucide!!!
-
-// TODO: use jsonresume
-
 export const jsonResumeSample = {
   "basics": {
     "name": "Samantha Jones",

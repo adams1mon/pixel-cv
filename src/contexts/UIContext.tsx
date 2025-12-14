@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
+// TODO: should we use zustand instead of context?
+
 // Section types following JsonResume standard - ALL 12 sections included
 export type SidebarSection = 
   | 'basics' 
@@ -25,6 +27,8 @@ export interface SectionConfig {
   description: string;
 }
 
+export type MobileTab = 'editor' | 'preview';
+
 // UI Context interface
 interface UIContextType {
   // Section navigation
@@ -35,6 +39,10 @@ interface UIContextType {
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
   toggleSidebar: () => void;
+
+  // Mobile tab nav
+  activeMobileTab: MobileTab;
+  setActiveMobileTab: (tab: MobileTab) => void;
   
   // Section configuration
   sections: SectionConfig[];
@@ -122,12 +130,15 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
   const [activeSection, setActiveSection] = useState<SidebarSection>('basics');
   
   // Sidebar state - default to expanded for desktop
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(true);
   
   // Toggle sidebar helper
   const toggleSidebar = () => {
     setSidebarCollapsed(prev => !prev);
   };
+
+  // Mobile tab state, default to editor
+  const [activeMobileTab, setActiveMobileTab] = useState<MobileTab>('editor');
   
   const contextValue: UIContextType = {
     activeSection,
@@ -135,6 +146,8 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
     sidebarCollapsed,
     setSidebarCollapsed,
     toggleSidebar,
+    activeMobileTab,
+    setActiveMobileTab,
     sections: SECTIONS,
   };
 
