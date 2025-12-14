@@ -11,7 +11,7 @@ export const TemplateSettingsEditor: React.FC = () => {
     <div className="section-editor max-w-4xl">
       <EditorHeader
         title="Template Settings"
-        subtitle="Choose and customize your CV template"
+        subtitle="Customize your CV template"
       />
       
       <div className="space-y-6">
@@ -26,10 +26,12 @@ export const TemplateSettingsEditor: React.FC = () => {
           ))}
         </div>
       </div>
+
+      <TemplateSettings />
       
-      <div className="w-90 mt-12 flex flex-col m-auto text-center">
+      <div className="mt-12 flex flex-col m-auto text-center">
         <p className="text-slate-700 text-md font-bold text-center">
-          More templates and settings coming soon!
+          More templates and options coming soon! 🚧
         </p>
 
         <a className="mt-8 underline text-blue-400 text-md font-normal" href="https://x.com/@slimptr" target="_blank">DM me for any requests.</a>
@@ -38,3 +40,29 @@ export const TemplateSettingsEditor: React.FC = () => {
     </div>
   );
 };
+
+function TemplateSettings() {
+
+  const pageWrap = useCVStore(s => s.pageWrap);
+  const setPageWrap = useCVStore(s => s.setPageWrap);
+
+  return (
+    <div className="mt-8">
+      <h2 className="text-lg font-bold text-gray-900 mb-2">Options</h2>
+      <div className="flex items-center gap-x-2 px-2 py-2">
+        <label 
+          htmlFor="page-wrap" 
+          className="text-sm text-gray-600"
+        >
+          Enable PDF page wrapping
+        </label>
+        <input
+          checked={pageWrap}
+          id="page-wrap"
+          type="checkbox"
+          onChange={e => setPageWrap(e.target.checked)}
+        />
+      </div>
+    </div>
+  );
+}

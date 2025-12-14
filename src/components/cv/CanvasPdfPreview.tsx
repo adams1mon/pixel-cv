@@ -66,7 +66,7 @@ export const CanvasPdfPreview: React.FC<CanvasPdfPreviewProps> = ({
   }
 
   return (
-    <div className="relative w-full h-full overflow-auto bg-none group">
+    <div className="relative w-full h-full overflow-auto bg-none">
       { 
         pdfGenerating ?
         <PdfLoading />
@@ -141,7 +141,7 @@ function OverlayControls({
 
   return (
     <div className="absolute bottom-6 pointer-events-auto w-full z-10">
-      <div className="w-48 flex items-center justify-center gap-1 mx-auto border-2 rounded-md bg-white/70 backdrop-blur-sm shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="w-48 flex items-center justify-center gap-1 mx-auto border-2 rounded-md bg-white/70 backdrop-blur-sm shadow-sm">
         <button
           onClick={zoomOut}
           title="Zoom out"
