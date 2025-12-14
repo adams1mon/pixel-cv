@@ -43,7 +43,7 @@ export const CVBuilder: React.FC = () => {
         );
       case 'preview':
         return (
-          <div className="h-full flex-1 p-2 shadow-sm overflow-hidden bg-gray-500 pb-16">
+          <div className="h-full p-2 shadow-sm overflow-hidden bg-gray-500 pb-16">
             <CanvasPdfPreview
               initialScale={1}
             />
@@ -75,7 +75,7 @@ export const CVBuilder: React.FC = () => {
           <>
             {/* Desktop 3 column layout */}
             {/* Middle - Section Editor */}
-            <div className="h-full max-w-xl flex-1 overflow-hidden p-2">
+            <div className="h-full max-w-6xl flex-1 overflow-hidden p-2">
               <SectionRouter />
             </div>
 
