@@ -15,7 +15,8 @@ import { VolunteerSectionEditor } from './sections/volunteer/VolunteerSectionEdi
 import { CertificatesSectionEditor } from './sections/certificates/CertificatesSectionEditor';
 import { InterestsSectionEditor } from './sections/interests/InterestsSectionEditor';
 import { ReferencesSectionEditor } from './sections/references/ReferencesSectionEditor';
-import { TemplateSettingsEditor } from '../templates/TemplateSettingsEditor';
+import { TemplateSettingsEditor } from './sections/template_settings/TemplateSettingsEditor';
+import { Dashboard } from './sections/dashboard/Dashboard';
 
 // Placeholder component for sections that don't exist yet
 const PlaceholderSectionEditor: React.FC<{ sectionName: string; description: string }> = ({ sectionName, description }) => (
@@ -41,6 +42,9 @@ export const SectionRouter: React.FC = () => {
 
   const renderActiveSection = () => {
     switch (activeSection) {
+      case 'dashboard':
+        return <Dashboard />
+
       case 'template':
         return <TemplateSettingsEditor />
 

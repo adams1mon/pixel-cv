@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
 import {
-  EnrichedJsonResumeBasics,
   EnrichedJsonResumeWork,
   EnrichedJsonResumeEducation,
   EnrichedJsonResumeProject,
@@ -25,23 +24,7 @@ import { jsonResumeSample } from '@/components/cv/jsonresume-sample';
 
 const CV_STORAGE_KEY = 'pixel-cv-jsonresume-data';
 
-type EnrichedJsonResumeKeys = Omit<EnrichedJsonResume, "_metadata">;
-type EnrichedJsonResumeArrayKeys = Omit<EnrichedJsonResumeKeys, "basics">;
-
-type SectionTypeMap = {
-  basics: EnrichedJsonResumeBasics;
-  work: EnrichedJsonResumeWork[];
-  projects: EnrichedJsonResumeProject[];
-  education: EnrichedJsonResumeEducation[];
-  skills: EnrichedJsonResumeSkill[];
-  volunteer: EnrichedJsonResumeVolunteer[];
-  awards: EnrichedJsonResumeAward[];
-  languages: EnrichedJsonResumeLanguage[];
-  certificates: EnrichedJsonResumeCertificate[];
-  interests: EnrichedJsonResumeInterest[];
-  publications: EnrichedJsonResumePublication[];
-  references: EnrichedJsonResumeReference[];
-};
+type EnrichedJsonResumeArrayKeys = Omit<EnrichedJsonResume, "basics" | "_metadata">;
 
 type ArraySectionItemTypeMap = {
   work: EnrichedJsonResumeWork;
@@ -65,6 +48,7 @@ type CVState = {
 
   resumes: Record<string, EnrichedJsonResume>;
   currentResumeId: string;
+  setCurrentResumeId: (id: string) => void;
 
   isLoaded: boolean; // Track if data has been loaded from localStorage
 
@@ -72,9 +56,10 @@ type CVState = {
   setJsonResume: (data: EnrichedJsonResume) => void;
 
   // updateSection: <T extends SectionName>(
-  updateSection: <T extends keyof EnrichedJsonResumeKeys>(
+  updateSection: <T extends keyof EnrichedJsonResume>(
     section: T,
-    item: SectionTypeMap[T]
+    // item: SectionTypeMap[T]
+    item: EnrichedJsonResume[T]
   ) => void;
   
   // Universal item update function
@@ -121,21 +106,27 @@ export const useCVStore = create<CVState>()(
 
       setJsonResume: (data) => set({ data }),
 
-      updateSection: <T extends keyof EnrichedJsonResumeKeys>(
+      updateSection: <T extends keyof EnrichedJsonResume>(
         section: T,
-        item: SectionTypeMap[T]
+        item: EnrichedJsonResume[T]
       ) => set(state => {
         const newData = {
+
           ...state.data,
+
+          // set section
           [section]: item,
-        }
+
+          // set updatedAt
+          _metadata: {
+            ...state.data._metadata,
+            updatedAt: new Date().toISOString(),
+          }
+        };
+
         const newResumes = state.resumes;
         newResumes[state.currentResumeId] = newData;
         return {
-          // resumes: {
-          //   ...state.resumes,
-          //   [state.currentResumeId]: newData,
-          // },
           resumes: newResumes,
           data: newData,
         }
@@ -163,7 +154,7 @@ export const useCVStore = create<CVState>()(
         // Create updated array with item replaced at index
         const updatedArray = currentArray.map((existingItem, i) => 
           i === index ? item : existingItem
-        ) as SectionTypeMap[T];
+        ) as EnrichedJsonResume[T];
 
         get().updateSection(section, updatedArray);
       },
@@ -217,32 +208,6 @@ export const useCVStore = create<CVState>()(
         }
       },
 
-      // loadFromLocalStorage: () => {
-      //   try {
-      //     const savedData = localStorage.getItem(CV_STORAGE_KEY);
-      //     if (savedData) {
-      //       const jsonResume = parseAndEnrichJsonResume(savedData);
-      //       set({ data: jsonResume, isLoaded: true });
-      //       console.log('Resume data loaded from localStorage');
-      //     } else {
-      //       set({ isLoaded: true });
-      //     }
-      //   } catch (error) {
-      //     console.error('Failed to load resume data from localStorage:', error);
-      //     set({ isLoaded: true });
-      //   }
-      // },
-
-      // saveToLocalStorage: () => {
-      //   try {
-      //     const { data } = get();
-      //     localStorage.setItem(CV_STORAGE_KEY, JSON.stringify(data));
-      //     console.log('Resume data saved to localStorage');
-      //   } catch (error) {
-      //     console.error('Failed to save resume data to localStorage:', error);
-      //   }
-      // },
-
       // TODO: add move up/down functionality for resume section items
 
       // TODO: maybe separate this
@@ -291,7 +256,8 @@ export const useCVStore = create<CVState>()(
 
       // from the template registry
       selectedTemplate: "modern",
-      setSelectedTemplate: d => set(() => ({ selectedTemplate: d }))
+      setSelectedTemplate: d => set(() => ({ selectedTemplate: d })),
+      setCurrentResumeId: (id) => set(() => ({ currentResumeId: id })),
     }
   })
 );

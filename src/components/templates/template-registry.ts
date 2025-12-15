@@ -15,15 +15,14 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateConfig> = {
     id: 'modern',
     name: 'Modern',
     description: 'Clean, professional single-column layout',
-    // TODO: preview
-    preview: '', // We'll add previews later
+    preview: '/modern-react-template.png',
     component: ModernReactPdf
   },
   'alpha': {
     id: 'alpha',
     name: 'Alpha', 
     description: 'Two-column layout with skills sidebar',
-    preview: '',
+    preview: '/alpha-template.png',
     component: AlphaPdfTemplate
   }
 };

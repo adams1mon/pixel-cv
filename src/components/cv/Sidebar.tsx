@@ -18,6 +18,7 @@ import {
   Menu,
   BadgeCheck,
   Layout,
+  Palette,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -101,8 +102,10 @@ const getSectionIcon = (sectionId: string) => {
   const iconClass = "w-4 h-4";
   
   switch (sectionId) {
-    case 'template':
+    case 'dashboard':
       return <Layout className={iconClass} />; 
+    case 'template':
+      return <Palette className={iconClass} />; 
 
     case 'basics':
       return <User className={iconClass} />;

@@ -6,7 +6,6 @@ import { Plus, Trash2, ChevronDown, ChevronRight, Globe, Mail, MapPin, User, Bri
 import { InputField, EmailField, PhoneField, UrlField, TextArea } from '../shared/InputField';
 import { useCVStore } from '@/stores/cv-store';
 import { EditorHeader } from '../shared/EditorHeader';
-import { VisibilityToggle } from '../../VisibilityToggle';
 
 // TODO: crop image
 
@@ -116,14 +115,6 @@ export const BasicsSectionEditor: React.FC = () => {
 
   const profiles = basics.profiles || [];
 
-  // Toggle visibility for basics section
-  const toggleVisibility = () => {
-    updateSection("basics", {
-      ...basics,
-      _visible: !basics._visible
-    });
-  };
-
   return (
     <div className="section-editor max-w-4xl">
 
@@ -131,8 +122,6 @@ export const BasicsSectionEditor: React.FC = () => {
         title="Personal Information"
         subtitle="Your core personal details, contact information, and professional summary."
       />
-
-      <VisibilityToggle visible={basics._visible} onToggle={toggleVisibility} />
 
       <div className="space-y-8">
         {/* Personal Identity Section */}

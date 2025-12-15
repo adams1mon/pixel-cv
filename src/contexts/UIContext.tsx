@@ -18,6 +18,7 @@ export type SidebarSection =
   | 'interests' 
   | 'publications' 
   | 'references'
+  | 'dashboard'
   | 'template';
 
 // Section configuration for navigation
@@ -48,8 +49,14 @@ interface UIContextType {
   sections: SectionConfig[];
 }
 
+// TODO: move the icons from the sidebar here
 // Section configuration following JsonResume standard - ALL 12 sections
 const SECTIONS: SectionConfig[] = [
+  { 
+    id: 'dashboard', 
+    label: 'Dashboard', 
+    description: 'View and manage all your resumes',
+  },
   { 
     id: 'template', 
     label: 'Template Settings', 

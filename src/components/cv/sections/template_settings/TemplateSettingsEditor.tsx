@@ -1,6 +1,6 @@
 import { useCVStore } from "@/stores/cv-store";
-import { EditorHeader } from "../cv/sections/shared/EditorHeader";
-import { TEMPLATE_REGISTRY } from "./template-registry";
+import { EditorHeader } from "../shared/EditorHeader";
+import { TEMPLATE_REGISTRY } from "../../../templates/template-registry";
 import { TemplateCard } from "./TemplateCard";
 
 export const TemplateSettingsEditor: React.FC = () => {
@@ -28,7 +28,7 @@ export const TemplateSettingsEditor: React.FC = () => {
       </div>
 
       <TemplateSettings />
-      
+
       <div className="mt-12 flex flex-col m-auto text-center">
         <p className="text-slate-700 text-md font-bold text-center">
           More templates and options coming soon! 🚧
@@ -49,19 +49,22 @@ function TemplateSettings() {
   return (
     <div className="mt-8">
       <h2 className="text-lg font-bold text-gray-900 mb-2">Options</h2>
-      <div className="flex items-center gap-x-2 px-2 py-2">
-        <label 
-          htmlFor="page-wrap" 
-          className="text-sm text-gray-600"
-        >
-          Enable PDF page wrapping
-        </label>
-        <input
-          checked={pageWrap}
-          id="page-wrap"
-          type="checkbox"
-          onChange={e => setPageWrap(e.target.checked)}
-        />
+      <div className="text-gray-600 text-sm px-2 py-2 flex flex-col gap-y-2">
+
+        <div className="flex items-center gap-x-2">
+          <label 
+            htmlFor="page-wrap" 
+          >
+            Enable PDF page wrapping
+          </label>
+          <input
+            checked={pageWrap}
+            id="page-wrap"
+            type="checkbox"
+            onChange={e => setPageWrap(e.target.checked)}
+            className="p-0 m-0"
+          />
+        </div>
       </div>
     </div>
   );
