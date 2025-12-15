@@ -83,7 +83,7 @@ export const CanvasPdfPreview: React.FC<CanvasPdfPreviewProps> = ({
           <Document
             // changing key every time the doc loads to prevent some error
             // https://github.com/wojtekmaj/react-pdf/issues/974
-            className="h-full px-2 overflow-auto pb-12"
+            className="h-full px-2 overflow-auto pt-10"
             file={pdfBlob}
             onLoadSuccess={onLoadSuccess}
             loading={<PdfLoading />}
@@ -140,8 +140,8 @@ function OverlayControls({
   };
 
   return (
-    <div className="absolute bottom-6 pointer-events-auto w-full z-10">
-      <div className="w-48 flex items-center justify-center gap-1 mx-auto border-2 rounded-md bg-white/70 backdrop-blur-sm shadow-sm">
+    <div className="absolute top-1 pointer-events-auto w-full z-10">
+      <div className="w-48 flex items-center justify-center gap-1 mx-auto border-2 rounded-md bg-white opacity-80 shadow-sm">
         <button
           onClick={zoomOut}
           title="Zoom out"
@@ -149,7 +149,8 @@ function OverlayControls({
         >
           <ZoomOut className="w-4 h-4" />
         </button>
-        <div className="flex items-center px-1 py-1">
+        <div className="flex items-center px-1 py-1 text-gray-800 text-sm">
+          %
           <input
             type="number"
             inputMode="numeric"
@@ -159,7 +160,7 @@ function OverlayControls({
             value={scaleInput}
             onChange={onScaleInputChange}
             onBlur={onScaleInputBlur}
-            className="text-center text-sm text-gray-800 bg-none outline-none appearance-none"
+            className="w-11 text-center text-sm bg-none outline-none appearance-none"
             style={{ WebkitAppearance: 'none' as any, MozAppearance: 'textfield' as any }}
           />
       </div>

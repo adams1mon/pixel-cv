@@ -227,8 +227,8 @@ export const createDefaultMetadata = (id?: string): JsonResumeMetadataExtension 
 
   id: id || nanoid(),
   name: `CV-${Date.now().toString()}`,
-  createdAt: Date.now().toString(),
-  updatedAt: Date.now().toString(),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
 });
 
 export const createEmptyBasics = (): EnrichedJsonResumeBasics => ({

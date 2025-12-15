@@ -1,5 +1,5 @@
 import { Check } from "lucide-react";
-import { TemplateConfig } from "./template-registry";
+import { TemplateConfig } from "../../../templates/template-registry";
 
 // src/components/cv/sections/template/TemplateCard.tsx
 interface TemplateCardProps {
@@ -26,7 +26,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
     >
       <div className="aspect-video bg-gray-100 rounded mb-3 flex items-center justify-center">
         {template.preview ? (
-          <img src={template.preview} alt={template.name} className="w-full h-full object-cover rounded" />
+          <img src={template.preview} alt={template.name} className="w-full h-full object-contain rounded" />
         ) : (
           <div className="text-gray-400 text-sm">Preview coming soon</div>
         )}
