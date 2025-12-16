@@ -3,7 +3,7 @@ import { TEMPLATE_REGISTRY } from "../templates/template-registry";
 
 export function TemplateName() {
 
-  const template = useCVStore(s => s.selectedTemplate);
+  const template = useCVStore(s => s.data)._metadata.templateId;
 
   return (
     <p

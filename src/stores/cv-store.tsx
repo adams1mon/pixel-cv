@@ -17,6 +17,7 @@ import {
   parseAndEnrichJsonResume,
   enrichJsonResume,
   parseAndEnrichJsonResumes,
+  createEmptyResume,
 } from '../types/jsonresume';
 import { pdf } from '@react-pdf/renderer';
 import { TEMPLATE_REGISTRY } from '@/components/templates/template-registry';
@@ -48,29 +49,26 @@ type CVState = {
 
   resumes: Record<string, EnrichedJsonResume>;
   currentResumeId: string;
-  setCurrentResumeId: (id: string) => void;
 
   isLoaded: boolean; // Track if data has been loaded from localStorage
 
-  // actions
-  setJsonResume: (data: EnrichedJsonResume) => void;
+  selectResume: (id: string) => void;
+  createResume: (name?: string) => void;
+  addResume: (resume: EnrichedJsonResume) => void;
+  deleteResume: (id: string) => void;
 
-  // updateSection: <T extends SectionName>(
   updateSection: <T extends keyof EnrichedJsonResume>(
     section: T,
-    // item: SectionTypeMap[T]
     item: EnrichedJsonResume[T]
   ) => void;
   
   // Universal item update function
-  // updateSectionItem: <T extends ArraySectionItemName>(
   updateSectionItem: <T extends keyof EnrichedJsonResumeArrayKeys>(
     section: T,
     index: number,
     item: ArraySectionItemTypeMap[T]
   ) => void;
   
-  exportAsJson: () => string;
   importFromJson: (jsonString: string) => void;
   
   // localStorage control
@@ -85,7 +83,6 @@ type CVState = {
   pageWrap: boolean;
   setPageWrap: (d: boolean) => void;
 
-  selectedTemplate: string;
   setSelectedTemplate: (templateId: string) => void;
 };
 
@@ -104,31 +101,70 @@ export const useCVStore = create<CVState>()(
 
       isLoaded: false,
 
-      setJsonResume: (data) => set({ data }),
+      selectResume: (id) => set(state => { 
+        if (state.resumes[id]) {
+          return {
+            data: state.resumes[id],
+            currentResumeId: id 
+          };
+        } else {
+          return state;
+        }
+      }),
+
+      createResume: (name?: string) => {
+        const resume = createEmptyResume(name);
+        get().addResume(resume);
+      },
+
+      addResume: (resume: EnrichedJsonResume) => {
+        set(state => ({
+          resumes: {
+            ...state.resumes,
+            [resume._metadata.id]: resume
+          }
+        }));
+      },
+
+      deleteResume: (id: string) => {
+
+        const {[id]: _removed, ...resumes} = get().resumes;
+        
+        set({
+          resumes
+        });
+      },
 
       updateSection: <T extends keyof EnrichedJsonResume>(
         section: T,
         item: EnrichedJsonResume[T]
       ) => set(state => {
-        const newData = {
 
+        const newData = {
           ...state.data,
 
           // set section
           [section]: item,
-
-          // set updatedAt
-          _metadata: {
-            ...state.data._metadata,
-            updatedAt: new Date().toISOString(),
-          }
         };
 
-        const newResumes = state.resumes;
-        newResumes[state.currentResumeId] = newData;
+        // update after the [section] is set, so we can overwrite things
+        // from newData here..
+
+        // set updatedAt
+        const updatedData = {
+          ...newData,
+          _metadata: {
+            ...newData._metadata,
+            updatedAt: new Date().toISOString(),
+          }
+        }
+
         return {
-          resumes: newResumes,
-          data: newData,
+          resumes: {
+            ...state.resumes,
+            [state.currentResumeId]: updatedData,
+          },
+          data: updatedData,
         }
       }),
 
@@ -159,14 +195,11 @@ export const useCVStore = create<CVState>()(
         get().updateSection(section, updatedArray);
       },
 
-      exportAsJson: () => {
-        try { return JSON.stringify(get().data, null, 2); } catch { return ''; }
-      },
-
       importFromJson: (jsonString) => {
         try { 
           const resume = parseAndEnrichJsonResume(jsonString);
-          get().setJsonResume(resume); 
+          const resumes = get().resumes;
+          set({ resumes: { ...resumes, [resume._metadata.id]: resume } });
         } catch (e) { 
           console.error(e); 
         }
@@ -225,7 +258,7 @@ export const useCVStore = create<CVState>()(
         }
 
         generateTimeout = setTimeout(async () => {
-          const { data, pageWrap, selectedTemplate } = get();
+          const { data, pageWrap } = get();
           if (!data) return;
 
           try {
@@ -233,9 +266,8 @@ export const useCVStore = create<CVState>()(
             
             set(() => ({ pdfGenerating: true, pdfError: null }));
 
-            const template = TEMPLATE_REGISTRY[selectedTemplate];
+            const template = TEMPLATE_REGISTRY[data._metadata.templateId];
 
-            // const cv = <ModernReactPdf data={data} pageWrap={pageWrap} />
             const cv = <template.component data={data} pageWrap={pageWrap} />
 
             const blob = await pdf(cv).toBlob();
@@ -254,10 +286,14 @@ export const useCVStore = create<CVState>()(
       pageWrap: true,
       setPageWrap: d => set(() => ({ pageWrap: d })),
 
-      // from the template registry
-      selectedTemplate: "modern",
-      setSelectedTemplate: d => set(() => ({ selectedTemplate: d })),
-      setCurrentResumeId: (id) => set(() => ({ currentResumeId: id })),
+      setSelectedTemplate: templateId => {
+        const state = get();
+
+        get().updateSection("_metadata", {
+          ...state.resumes[state.currentResumeId]._metadata,
+          templateId: templateId,
+        });
+      },
     }
   })
 );
@@ -291,10 +327,10 @@ export const initializeCVStore = () => {
   
   // Subscribe to data changes for debounced saving
   useCVStore.subscribe(
-    (state) => state.data,
-    (data, previousData) => {
+    (state) => state.resumes,
+    (resumes, previousResumes) => {
       // Only save if data has actually changed and we've loaded from localStorage
-      if (data !== previousData && useCVStore.getState().isLoaded) {
+      if (resumes !== previousResumes && useCVStore.getState().isLoaded) {
         // Clear existing timeout
         if (saveTimeout) {
           clearTimeout(saveTimeout);
@@ -318,7 +354,7 @@ export const initializeCVStore = () => {
   );
 
   useCVStore.subscribe(
-    (state) => state.selectedTemplate,
+    (state) => state.currentResumeId,
     () => {
       useCVStore.getState().generatePdfBlob();
     }

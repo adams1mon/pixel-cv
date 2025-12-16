@@ -6,7 +6,9 @@ export const Dashboard: React.FC = () => {
 
   const resumes = useCVStore(s => s.resumes);
   const currentResumeId = useCVStore(s => s.currentResumeId);
-  const setCurrentResumeId = useCVStore(s => s.setCurrentResumeId);
+  const setCurrentResumeId = useCVStore(s => s.selectResume);
+  const createResume = useCVStore(s => s.createResume);
+  const deleteResume = useCVStore(s => s.deleteResume);
 
   const resumeList = Object.values(resumes).sort((a, b) => (Date.parse(b._metadata.updatedAt) - Date.parse(a._metadata.updatedAt)));
 
@@ -16,8 +18,17 @@ export const Dashboard: React.FC = () => {
         title="Resume Dashboard"
         subtitle="Manage and switch between your resumes"
       />
-      
+
       <div className="space-y-6">
+        <div className="flex justify-start mb-6">
+          <button
+            onClick={() => createResume()}
+            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Create New CV
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {resumeList.map(resume => (
             <ResumeCard
@@ -25,6 +36,7 @@ export const Dashboard: React.FC = () => {
               resume={resume}
               isSelected={currentResumeId === resume._metadata.id}
               onSelect={() => setCurrentResumeId(resume._metadata.id)}
+              onDelete={() => deleteResume(resume._metadata.id)}
             />
           ))}
         </div>
@@ -37,15 +49,7 @@ export const Dashboard: React.FC = () => {
         )}
       </div>
 
-      {/* TODO: create, duplicate, delete? */}
-      <div className="mt-12 flex flex-col m-auto text-center">
-        <p className="text-slate-700 text-md font-bold text-center">
-          More features coming soon! 🚧
-        </p>
-        <p className="mt-2 text-black text-md font-normal">
-          Right now there's no create, delete, duplicate, etc...
-        </p>
-      </div>
+      {/* TODO: duplicate? */}
     </div>
   );
 };

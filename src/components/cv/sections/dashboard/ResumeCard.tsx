@@ -1,31 +1,31 @@
 import { EnrichedJsonResume } from "@/types/jsonresume";
-import { Check } from "lucide-react";
+import { Check, Trash2 } from "lucide-react";
 
 interface ResumeCardProps {
   resume: EnrichedJsonResume;
   isSelected: boolean;
   onSelect: () => void;
+  onDelete: () => void;
 }
 
 export const ResumeCard: React.FC<ResumeCardProps> = ({ 
   resume, 
   isSelected, 
-  onSelect 
+  onSelect,
+  onDelete, 
 }) => {
-  const formatDate = (timestamp: string) => {
-    try {
-      const date = new Date(timestamp);
-      return date.toLocaleString("en-UK");
-    } catch (e) {
-      console.warn("error parsing date", e);
-      return timestamp
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the card selection
+    if (window.confirm(`Are you sure you want to delete "${resume._metadata.name || resume.basics.name || 'this resume'}"?`)) {
+      onDelete();
     }
   };
 
   return (
     <div 
       className={`
-        p-4 border-2 rounded-lg cursor-pointer transition-all
+        p-4 border-2 rounded-lg cursor-pointer transition-all relative
         ${isSelected 
           ? 'border-blue-500 bg-blue-50' 
           : 'border-gray-200 hover:border-gray-300'
@@ -33,6 +33,17 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
       `}
       onClick={onSelect}
     >
+      {/* Delete button */}
+      {!isSelected &&
+        <button
+          onClick={handleDeleteClick}
+          className="absolute top-2 right-2 p-1 text-red-500 hover:text-red-700 hover:bg-red-100 hover:cursor-pointer rounded transition-colors"
+          title="Delete resume"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      }
+
       {/* todo: show template? */}
       
       <h3 className="font-semibold text-gray-900 mb-1">
@@ -54,4 +65,14 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
       )}
     </div>
   );
+};
+
+function formatDate(timestamp: string) {
+  try {
+    const date = new Date(timestamp);
+    return date.toLocaleString("en-UK");
+  } catch (e) {
+    console.warn("error parsing date", e);
+    return timestamp
+  }
 };

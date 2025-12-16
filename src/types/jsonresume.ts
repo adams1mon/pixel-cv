@@ -45,6 +45,8 @@ export interface JsonResumeMetadataExtension {
 
   // For data format compatibility
   version: string;
+
+  templateId: string;
 }
 
 export interface VisibleExtension {
@@ -222,13 +224,37 @@ export type JsonResumePartialDateString = string; // YYYY-MM or YYYY format
 // TODO: add functions to enrich jsonresume with 
 // section show/hide options
 
-export const createDefaultMetadata = (id?: string): JsonResumeMetadataExtension => ({
-  version: "1.0.0",
+export const createEmptyResume = (name?: string): EnrichedJsonResume => {
+  return {
+    _metadata: createDefaultMetadata({name}),
+    basics: createEmptyBasics(),
+    work: [],
+    projects: [],
+    education: [],
+    publications: [],
+    volunteer: [],
+    awards: [],
+    skills: [],
+    languages: [],
+    certificates: [],
+    interests: [],
+    references: [],
+  };
+};
 
+export const createDefaultMetadata = ({
+  id,  // unused for now..
+  name
+}: {
+  id?: string, 
+  name?: string
+}): JsonResumeMetadataExtension => ({
+  version: "1.0.0",
   id: id || nanoid(),
-  name: `CV-${Date.now().toString()}`,
+  name: name || `CV-${Date.now().toString()}`,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
+  templateId: "modern",
 });
 
 export const createEmptyBasics = (): EnrichedJsonResumeBasics => ({
@@ -394,7 +420,7 @@ export function enrichJsonResume(jsonResume: JsonResume): EnrichedJsonResume {
   };
   
   return {
-    _metadata: createDefaultMetadata(),
+    _metadata: createDefaultMetadata({}),
     basics: enrichedBasics,
     work: enrichArray<JsonResumeWork>(jsonResume.work) as EnrichedJsonResumeWork[],
     projects: enrichArray(jsonResume.projects) as EnrichedJsonResumeProject[],

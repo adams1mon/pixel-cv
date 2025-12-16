@@ -4,7 +4,7 @@ import { TEMPLATE_REGISTRY } from "../../../templates/template-registry";
 import { TemplateCard } from "./TemplateCard";
 
 export const TemplateSettingsEditor: React.FC = () => {
-  const selectedTemplate = useCVStore(s => s.selectedTemplate);
+  const selectedTemplate = useCVStore(s => s.data)._metadata.templateId;
   const setSelectedTemplate = useCVStore(s => s.setSelectedTemplate);
   
   return (
