@@ -42,3 +42,6 @@ next-env.d.ts
 fonts
 
 /image_test
+cv-images
+my-cv
+my-cv*

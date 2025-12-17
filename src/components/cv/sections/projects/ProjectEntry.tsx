@@ -13,6 +13,8 @@ interface ProjectEntryProps {
   onRemove: () => void;
 }
 
+// TODO: entries are LAGGING
+
 export const ProjectEntry: React.FC<ProjectEntryProps> = ({
   item,
   index,

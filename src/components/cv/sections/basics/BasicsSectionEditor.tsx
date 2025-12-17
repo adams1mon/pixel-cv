@@ -6,6 +6,7 @@ import { Plus, Trash2, ChevronDown, ChevronRight, Globe, Mail, MapPin, User, Bri
 import { InputField, EmailField, PhoneField, UrlField, TextArea } from '../shared/InputField';
 import { useCVStore } from '@/stores/cv-store';
 import { EditorHeader } from '../shared/EditorHeader';
+import { ImageCropper } from './ImageCropper';
 
 // TODO: crop image
 
@@ -33,6 +34,9 @@ export const BasicsSectionEditor: React.FC = () => {
     location: false,
     profiles: true
   });
+
+  // for cropping the profile image
+  const [isCropping, setIsCropping] = useState(false);
 
   // Toggle expandable sections
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -153,31 +157,54 @@ export const BasicsSectionEditor: React.FC = () => {
               </label>
               
               {basics.image ? (
-                <div className="flex items-center space-x-4">
-                    <img
-                      src={basics.image}
-                      alt="Profile"
-                      className="w-20 h-20 object-cover"
-                    />
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-600">Profile photo uploaded</p>
+                <>
+                  <div className="flex items-center space-x-4">
+                      <img
+                        src={basics.image}
+                        alt="Profile"
+                        className="w-20 h-20 object-cover"
+                      />
+                    <div className="flex-1 flex flex-col items-start gap-y-1">
+                      <p className="text-sm text-gray-600">Profile photo uploaded</p>
+                      <button
+                        type="button"
+                        onClick={() => document.getElementById('image-upload')?.click()}
+                        className="hover:underline block text-sm text-blue-600 hover:text-blue-700"
+                      >
+                        Change photo
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsCropping(prev => !prev)}
+                        className="hover:underline block text-sm text-blue-600 hover:text-blue-700"
+                      >
+                        {isCropping ? 'Hide crop tool' : 'Crop'}
+                      </button>
+                    </div>
                     <button
                       type="button"
-                      onClick={() => document.getElementById('image-upload')?.click()}
-                      className="text-sm text-blue-600 hover:text-blue-700"
+                      onClick={removeImage}
+                      className="p-1 text-red-600 hover:text-red-700 hover:bg-red-100 rounded-md"
+                      aria-label="Remove image"
                     >
-                      Change photo
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={removeImage}
-                    className="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
-                    aria-label="Remove image"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+
+                  {isCropping && (
+                    <div className="mt-4">
+                      <ImageCropper
+                        src={basics.image}
+                        onCropped={(croppedDataUrl) => {
+                          console.log("updating with cropped image");
+                          console.log(croppedDataUrl);
+                          handleBasicsUpdate({ image: croppedDataUrl });
+                          setIsCropping(false);
+                        }}
+                      />
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
                   <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />

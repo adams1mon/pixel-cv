@@ -210,13 +210,37 @@ export const useCVStore = create<CVState>()(
           const jsonString = localStorage.getItem(CV_STORAGE_KEY);
           if (jsonString) {
             const savedData = parseAndEnrichJsonResumes(jsonString);
-            const firstResume = Object.values(savedData.resumes)[0];
+            const currentResumeId = savedData.currentResumeId;
+            const resumes = savedData.resumes;
+
+            if (!resumes || Object.values(resumes).length === 0) { 
+                // nothing to load here..
+                set({isLoaded: true});
+                console.log("resumes empty, loaded...");
+                return;
+            }
+
+            if (!currentResumeId || !resumes[currentResumeId]) {
+                // select the first resume
+                const firstResume = Object.values(resumes)[0];
+                set({
+                  resumes: resumes, 
+                  data: firstResume,
+                  currentResumeId: firstResume._metadata.id,
+                  isLoaded: true,
+                });
+                console.log("no current resume id, selected first");
+                return;
+            }
+
+            const selectedResume = resumes[currentResumeId];
             set({ 
-              resumes: savedData.resumes, 
-              data: firstResume, 
-              currentResumeId: firstResume._metadata.id,
+              resumes: resumes, 
+              data: selectedResume, 
+              currentResumeId: currentResumeId,
               isLoaded: true,
             });
+
             console.log('Resumes loaded from localStorage');
           } else {
             set({ isLoaded: true });
@@ -227,6 +251,7 @@ export const useCVStore = create<CVState>()(
         }
       },
 
+      // TODO: cvs too large due to dataUrl images
       saveToLocalStorage: () => {
         try {
           const state = get();
@@ -316,7 +341,6 @@ export const initializeCVStore = () => {
   // Load from localStorage on initialization
   useCVStore.getState().loadFromLocalStorage();
   const data = useCVStore.getState().data;
-  console.log(data);
   
   // load sample if there's no saved data
   if (!useCVStore.getState().data) { 

@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   // Work/Experience styles
   workItem: {
     marginTop: 8,
-    paddingBottom: 4,
+    paddingBottom: 3,
     borderBottomWidth: 1,
     borderBottomColor: '#e5e7eb'
   },
