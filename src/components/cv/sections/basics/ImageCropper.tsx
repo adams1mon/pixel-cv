@@ -11,6 +11,7 @@ type ImageCropperProps = {
 
 type Point = { x: number; y: number };
 
+// TODO: doesn't work on mobile
 export const ImageCropper: React.FC<ImageCropperProps> = ({
   src,
   onCropped,
